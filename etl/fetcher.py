@@ -3,6 +3,10 @@ import json
 import requests
 from datetime import datetime
 from dateutil import tz
+from dotenv import load_dotenv
+
+# --- Load .env file ---
+load_dotenv()
 
 # --- Load environment variables ---
 TPOT_USER = os.getenv("TPOT_USER")
@@ -95,4 +99,6 @@ def main():
     log(f"Saved {len(all_hits)} documents to {filename}")
 
 if __name__ == "__main__":
-    main()
+    print(TPOT_HOST)
+    print(TPOT_USER)
+    # main()
