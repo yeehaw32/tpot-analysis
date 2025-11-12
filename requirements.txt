@@ -1,0 +1,7 @@
+requests
+python-dateutil
+PyYAML
+python-dotenv   # <-- ADD THIS
+flask
+chromadb
+openai

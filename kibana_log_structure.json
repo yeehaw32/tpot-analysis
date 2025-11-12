@@ -1,0 +1,654 @@
+##Wordpot start##
+
+{
+  "_index": "logstash-2025.11.11",
+  "_id": "624ic5oBfDhCb7HdHynI",
+  "_version": 1,
+  "_source": {
+    "dest_ip": "0.0.0.0",
+    "device_family": "Other",
+    "t-pot_ip_int": "10.20.20.10",
+    "dest_port": 80,
+    "browser_version": "",
+    "os_version": "",
+    "user_agent": "Mozilla/5.0 (compatible; WPScan-like; +https://wpscan.com/)",
+    "filename": "xmlrpc.php",
+    "plugin": "commonfiles",
+    "geoip_ext": {
+      "latitude": 55.7123,
+      "country_name": "Denmark",
+      "country_code3": "DK",
+      "timezone": "Europe/Copenhagen",
+      "location": {
+        "lat": 55.7123,
+        "lon": 12.0564
+      },
+      "longitude": 12.0564,
+      "asn": 59701,
+      "continent_code": "EU",
+      "ip": "79.171.148.157",
+      "as_org": "NetNordic Denmark A/S",
+      "country_code2": "DK"
+    },
+    "type": "Wordpot",
+    "t-pot_hostname": "tpothost",
+    "t-pot_ip_ext": "79.171.148.157",
+    "src_port": 48948,
+    "url": "http://10.20.20.10/xmlrpc.php",
+    "browser_family": "Other",
+    "os_family": "Other",
+    "path": "/data/wordpot/log/wordpot.log",
+    "geoip": {},
+    "src_ip": "10.40.40.10",
+    "host": "bc680b47ce46",
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "@version": "1",
+    "timestamp": "2025-11-11T13:36:46.602729",
+    "@timestamp": "2025-11-11T13:36:46.602Z"
+  },
+  "fields": {
+    "geoip_ext.asn": [
+      59701
+    ],
+    "geoip_ext.country_name.keyword": [
+      "Denmark"
+    ],
+    "browser_family.keyword": [
+      "Other"
+    ],
+    "geoip_ext.longitude": [
+      12.0546875
+    ],
+    "t-pot_ip_int": [
+      "10.20.20.10"
+    ],
+    "geoip_ext.country_code2.keyword": [
+      "DK"
+    ],
+    "browser_version.keyword": [
+      ""
+    ],
+    "os_version.keyword": [
+      ""
+    ],
+    "type": [
+      "Wordpot"
+    ],
+    "filename.keyword": [
+      "xmlrpc.php"
+    ],
+    "path": [
+      "/data/wordpot/log/wordpot.log"
+    ],
+    "geoip_ext.continent_code.keyword": [
+      "EU"
+    ],
+    "type.keyword": [
+      "Wordpot"
+    ],
+    "geoip_ext.as_org": [
+      "NetNordic Denmark A/S"
+    ],
+    "host": [
+      "bc680b47ce46"
+    ],
+    "browser_version": [
+      ""
+    ],
+    "host.keyword": [
+      "bc680b47ce46"
+    ],
+    "dest_port": [
+      80
+    ],
+    "t-pot_hostname": [
+      "tpothost"
+    ],
+    "geoip_ext.country_name": [
+      "Denmark"
+    ],
+    "@version.keyword": [
+      "1"
+    ],
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "t-pot_ip_int.keyword": [
+      "10.20.20.10"
+    ],
+    "filename": [
+      "xmlrpc.php"
+    ],
+    "geoip_ext.continent_code": [
+      "EU"
+    ],
+    "t-pot_ip_ext.keyword": [
+      "79.171.148.157"
+    ],
+    "dest_ip.keyword": [
+      "0.0.0.0"
+    ],
+    "dest_ip": [
+      "0.0.0.0"
+    ],
+    "browser_family": [
+      "Other"
+    ],
+    "device_family.keyword": [
+      "Other"
+    ],
+    "geoip_ext.ip": [
+      "79.171.148.157"
+    ],
+    "geoip_ext.location": [
+      {
+        "coordinates": [
+          12.0564,
+          55.7123
+        ],
+        "type": "Point"
+      }
+    ],
+    "os_family": [
+      "Other"
+    ],
+    "tags.keyword": [
+      "_geoip_lookup_failure"
+    ],
+    "device_family": [
+      "Other"
+    ],
+    "geoip_ext.country_code3": [
+      "DK"
+    ],
+    "geoip_ext.country_code2": [
+      "DK"
+    ],
+    "src_ip": [
+      "10.40.40.10"
+    ],
+    "t-pot_ip_ext": [
+      "79.171.148.157"
+    ],
+    "geoip_ext.country_code3.keyword": [
+      "DK"
+    ],
+    "os_family.keyword": [
+      "Other"
+    ],
+    "@version": [
+      "1"
+    ],
+    "plugin.keyword": [
+      "commonfiles"
+    ],
+    "src_ip.keyword": [
+      "10.40.40.10"
+    ],
+    "user_agent": [
+      "Mozilla/5.0 (compatible; WPScan-like; +https://wpscan.com/)"
+    ],
+    "timestamp": [
+      "2025-11-11T13:36:46.602Z"
+    ],
+    "geoip_ext.latitude": [
+      55.71875
+    ],
+    "os_version": [
+      ""
+    ],
+    "geoip_ext.timezone.keyword": [
+      "Europe/Copenhagen"
+    ],
+    "user_agent.keyword": [
+      "Mozilla/5.0 (compatible; WPScan-like; +https://wpscan.com/)"
+    ],
+    "url": [
+      "http://10.20.20.10/xmlrpc.php"
+    ],
+    "url.keyword": [
+      "http://10.20.20.10/xmlrpc.php"
+    ],
+    "geoip_ext.as_org.keyword": [
+      "NetNordic Denmark A/S"
+    ],
+    "src_port": [
+      48948
+    ],
+    "t-pot_hostname.keyword": [
+      "tpothost"
+    ],
+    "@timestamp": [
+      "2025-11-11T13:36:46.602Z"
+    ],
+    "plugin": [
+      "commonfiles"
+    ],
+    "geoip_ext.timezone": [
+      "Europe/Copenhagen"
+    ],
+    "path.keyword": [
+      "/data/wordpot/log/wordpot.log"
+    ]
+  }
+}
+##Wordpot end##
+
+
+##Cowrie start##
+
+{
+  "_index": "logstash-2025.11.11",
+  "_id": "VG4Hc5oBfDhCb7Hdkicp",
+  "_version": 1,
+  "_source": {
+    "t-pot_ip_int": "10.20.20.10",
+    "eventid": "cowrie.session.closed",
+    "session": "86d546a619d7",
+    "geoip_ext": {
+      "latitude": 55.7123,
+      "country_name": "Denmark",
+      "country_code3": "DK",
+      "timezone": "Europe/Copenhagen",
+      "location": {
+        "lat": 55.7123,
+        "lon": 12.0564
+      },
+      "longitude": 12.0564,
+      "asn": 59701,
+      "continent_code": "EU",
+      "ip": "79.171.148.157",
+      "as_org": "NetNordic Denmark A/S",
+      "country_code2": "DK"
+    },
+    "type": "Cowrie",
+    "t-pot_hostname": "tpothost",
+    "message": "Connection lost after 12.2 seconds",
+    "t-pot_ip_ext": "79.171.148.157",
+    "duration": "12.2",
+    "sensor": "a469d5fefc67",
+    "path": "/data/cowrie/log/cowrie.json",
+    "geoip": {},
+    "src_ip": "10.40.40.10",
+    "host": "bc680b47ce46",
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "timestamp": "2025-11-11T13:07:47.243878Z",
+    "@version": "1",
+    "@timestamp": "2025-11-11T13:07:47.243Z"
+  },
+  "fields": {
+    "geoip_ext.ip": [
+      "79.171.148.157"
+    ],
+    "eventid": [
+      "cowrie.session.closed"
+    ],
+    "geoip_ext.location": [
+      {
+        "coordinates": [
+          12.0564,
+          55.7123
+        ],
+        "type": "Point"
+      }
+    ],
+    "geoip_ext.asn": [
+      59701
+    ],
+    "geoip_ext.country_name.keyword": [
+      "Denmark"
+    ],
+    "geoip_ext.longitude": [
+      12.0546875
+    ],
+    "session": [
+      "86d546a619d7"
+    ],
+    "t-pot_ip_int": [
+      "10.20.20.10"
+    ],
+    "geoip_ext.country_code2.keyword": [
+      "DK"
+    ],
+    "tags.keyword": [
+      "_geoip_lookup_failure"
+    ],
+    "eventid.keyword": [
+      "cowrie.session.closed"
+    ],
+    "type": [
+      "Cowrie"
+    ],
+    "geoip_ext.country_code3": [
+      "DK"
+    ],
+    "geoip_ext.country_code2": [
+      "DK"
+    ],
+    "duration": [
+      "12.2"
+    ],
+    "src_ip": [
+      "10.40.40.10"
+    ],
+    "t-pot_ip_ext": [
+      "79.171.148.157"
+    ],
+    "path": [
+      "/data/cowrie/log/cowrie.json"
+    ],
+    "geoip_ext.country_code3.keyword": [
+      "DK"
+    ],
+    "sensor.keyword": [
+      "a469d5fefc67"
+    ],
+    "geoip_ext.continent_code.keyword": [
+      "EU"
+    ],
+    "type.keyword": [
+      "Cowrie"
+    ],
+    "geoip_ext.as_org": [
+      "NetNordic Denmark A/S"
+    ],
+    "@version": [
+      "1"
+    ],
+    "host": [
+      "bc680b47ce46"
+    ],
+    "src_ip.keyword": [
+      "10.40.40.10"
+    ],
+    "host.keyword": [
+      "bc680b47ce46"
+    ],
+    "timestamp": [
+      "2025-11-11T13:07:47.243Z"
+    ],
+    "t-pot_hostname": [
+      "tpothost"
+    ],
+    "session.keyword": [
+      "86d546a619d7"
+    ],
+    "geoip_ext.latitude": [
+      55.71875
+    ],
+    "geoip_ext.country_name": [
+      "Denmark"
+    ],
+    "@version.keyword": [
+      "1"
+    ],
+    "geoip_ext.timezone.keyword": [
+      "Europe/Copenhagen"
+    ],
+    "message": [
+      "Connection lost after 12.2 seconds"
+    ],
+    "duration.keyword": [
+      "12.2"
+    ],
+    "geoip_ext.as_org.keyword": [
+      "NetNordic Denmark A/S"
+    ],
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "t-pot_hostname.keyword": [
+      "tpothost"
+    ],
+    "t-pot_ip_int.keyword": [
+      "10.20.20.10"
+    ],
+    "@timestamp": [
+      "2025-11-11T13:07:47.243Z"
+    ],
+    "geoip_ext.continent_code": [
+      "EU"
+    ],
+    "t-pot_ip_ext.keyword": [
+      "79.171.148.157"
+    ],
+    "geoip_ext.timezone": [
+      "Europe/Copenhagen"
+    ],
+    "sensor": [
+      "a469d5fefc67"
+    ],
+    "path.keyword": [
+      "/data/cowrie/log/cowrie.json"
+    ]
+  }
+}
+ 
+## Cowrie end ##
+
+
+
+## Dionaea start ##
+
+{
+  "_index": "logstash-2025.11.11",
+  "_id": "SW4Sc5oBfDhCb7HdgCi-",
+  "_version": 1,
+  "_source": {
+    "dest_ip": "172.19.0.2",
+    "t-pot_ip_int": "10.20.20.10",
+    "geoip_ext": {
+      "latitude": 55.7123,
+      "country_name": "Denmark",
+      "country_code3": "DK",
+      "timezone": "Europe/Copenhagen",
+      "location": {
+        "lat": 55.7123,
+        "lon": 12.0564
+      },
+      "longitude": 12.0564,
+      "asn": 59701,
+      "continent_code": "EU",
+      "ip": "79.171.148.157",
+      "as_org": "NetNordic Denmark A/S",
+      "country_code2": "DK"
+    },
+    "dest_port": 445,
+    "type": "Dionaea",
+    "t-pot_hostname": "tpothost",
+    "t-pot_ip_ext": "79.171.148.157",
+    "src_port": 41974,
+    "src_hostname": "",
+    "path": "/data/dionaea/log/dionaea.json",
+    "geoip": {},
+    "connection": {
+      "protocol": "smbd",
+      "type": "accept",
+      "transport": "tcp"
+    },
+    "src_ip": "10.40.40.10",
+    "host": "bc680b47ce46",
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "timestamp": "2025-11-11T13:19:42.457651",
+    "@version": "1",
+    "@timestamp": "2025-11-11T13:19:42.457Z"
+  },
+  "fields": {
+    "connection.transport.keyword": [
+      "tcp"
+    ],
+    "geoip_ext.asn": [
+      59701
+    ],
+    "geoip_ext.country_name.keyword": [
+      "Denmark"
+    ],
+    "geoip_ext.longitude": [
+      12.0546875
+    ],
+    "t-pot_ip_int": [
+      "10.20.20.10"
+    ],
+    "geoip_ext.country_code2.keyword": [
+      "DK"
+    ],
+    "type": [
+      "Dionaea"
+    ],
+    "path": [
+      "/data/dionaea/log/dionaea.json"
+    ],
+    "geoip_ext.continent_code.keyword": [
+      "EU"
+    ],
+    "type.keyword": [
+      "Dionaea"
+    ],
+    "geoip_ext.as_org": [
+      "NetNordic Denmark A/S"
+    ],
+    "host": [
+      "bc680b47ce46"
+    ],
+    "connection.protocol.keyword": [
+      "smbd"
+    ],
+    "host.keyword": [
+      "bc680b47ce46"
+    ],
+    "connection.transport": [
+      "tcp"
+    ],
+    "dest_port": [
+      445
+    ],
+    "t-pot_hostname": [
+      "tpothost"
+    ],
+    "connection.type": [
+      "accept"
+    ],
+    "geoip_ext.country_name": [
+      "Denmark"
+    ],
+    "@version.keyword": [
+      "1"
+    ],
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "src_hostname.keyword": [
+      ""
+    ],
+    "t-pot_ip_int.keyword": [
+      "10.20.20.10"
+    ],
+    "geoip_ext.continent_code": [
+      "EU"
+    ],
+    "t-pot_ip_ext.keyword": [
+      "79.171.148.157"
+    ],
+    "dest_ip.keyword": [
+      "172.19.0.2"
+    ],
+    "dest_ip": [
+      "172.19.0.2"
+    ],
+    "connection.type.keyword": [
+      "accept"
+    ],
+    "src_hostname": [
+      ""
+    ],
+    "geoip_ext.ip": [
+      "79.171.148.157"
+    ],
+    "geoip_ext.location": [
+      {
+        "coordinates": [
+          12.0564,
+          55.7123
+        ],
+        "type": "Point"
+      }
+    ],
+    "connection.protocol": [
+      "smbd"
+    ],
+    "tags.keyword": [
+      "_geoip_lookup_failure"
+    ],
+    "geoip_ext.country_code3": [
+      "DK"
+    ],
+    "geoip_ext.country_code2": [
+      "DK"
+    ],
+    "src_ip": [
+      "10.40.40.10"
+    ],
+    "t-pot_ip_ext": [
+      "79.171.148.157"
+    ],
+    "geoip_ext.country_code3.keyword": [
+      "DK"
+    ],
+    "@version": [
+      "1"
+    ],
+    "src_ip.keyword": [
+      "10.40.40.10"
+    ],
+    "timestamp": [
+      "2025-11-11T13:19:42.457Z"
+    ],
+    "geoip_ext.latitude": [
+      55.71875
+    ],
+    "geoip_ext.timezone.keyword": [
+      "Europe/Copenhagen"
+    ],
+    "geoip_ext.as_org.keyword": [
+      "NetNordic Denmark A/S"
+    ],
+    "src_port": [
+      41974
+    ],
+    "t-pot_hostname.keyword": [
+      "tpothost"
+    ],
+    "@timestamp": [
+      "2025-11-11T13:19:42.457Z"
+    ],
+    "geoip_ext.timezone": [
+      "Europe/Copenhagen"
+    ],
+    "path.keyword": [
+      "/data/dionaea/log/dionaea.json"
+    ]
+  }
+}
+
+## Dionaea end ##
+
+
+
+
+## Suricata start ##
+
+
+## Suricata end ##
+
+
+## Working fetch command ## 
+
+bertil@analysis:~$ curl -k -u admin:Nzs29zsa -H 'kbn-xsrf: true' -H 'Content-Type: application/json' "https://10.20.20.10:64297/kibana/api/console/proxy?path=logstash-2025.11.11/_search&method=POST" -d '{"size":10000,"sort":[{"@timestamp":"desc"}],
+     "query":{"terms":{"type.keyword":["Cowrie","Dionaea","Wordpot","Suricata"]}}}' >> 1.txt
+
