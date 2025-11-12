@@ -17,7 +17,20 @@ BASE_URL = f"{TPOT_HOST}{TPOT_PROXY_PATH}?path={TPOT_INDEX}/_search&method=POST"
 query = {
     "size": 10000,
     "sort": [{"@timestamp": "desc"}],
-    "query": {"terms": {"type.keyword": ["Cowrie","Dionaea","Wordpot","Suricata"]}}
+    "query": {
+        "bool": {
+            "should": [
+                {"term": {"type": "Cowrie"}},
+                {"term": {"type": "Dionaea"}},
+                {"term": {"type": "Wordpot"}},
+                {"term": {"type": "Suricata"}},
+                {"term": {"type.keyword": "Cowrie"}},
+                {"term": {"type.keyword": "Dionaea"}},
+                {"term": {"type.keyword": "Wordpot"}},
+                {"term": {"type.keyword": "Suricata"}}
+            ]
+        }
+    }
 }
 
 def main():
