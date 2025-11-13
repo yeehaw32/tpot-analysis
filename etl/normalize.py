@@ -1,5 +1,8 @@
 import os
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 NORMALIZED_BASE = os.getenv("NORMALIZED_BASE")
 ETL_DATA_DIR= os.getenv("ETL_DATA_DIR")
