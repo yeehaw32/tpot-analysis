@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-NORMALIZED_BASE = os.getenv("NORMALIZED_BASE")
-ETL_DATA_DIR = os.getenv("ETL_DATA_DIR")
+# Use the names from .env (with safe defaults)
+ETL_DATA_DIR = os.getenv("TPOT_RAW_DIR", "/data/tpot_sessions/raw")
+NORMALIZED_BASE = os.getenv("TPOT_NORMALIZED_DIR", "/data/tpot_sessions/normalized")
+
 
 def load_json_file(path):
     with open(path, "r") as f:
@@ -24,20 +26,21 @@ def find_latest_file(prefix):
 
 
 # -----------------------------
-# Normalizers (FIXED VERSIONS)
+# Normalizers
 # -----------------------------
 
 def normalize_cowrie(src):
+    # src is the _source object
     timestamp = src.get("@timestamp") or src.get("timestamp")
     event = {
         "timestamp": timestamp,
         "sensor": "Cowrie",
-        "session_id": src.get("session"),   # <<< CRITICAL FIX
+        "session_id": src.get("session"),  # key fix for sessionizing
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
         "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int") or src.get("t-pot_ip_ext"),
         "dest_port": src.get("dest_port"),
-        "protocol": src.get("protocol"),
+        "protocol": src.get("protocol"),  # ssh/telnet if present
         "eventid": src.get("eventid"),
         "message": src.get("message"),
         "url": None,
@@ -53,12 +56,13 @@ def normalize_wordpot(src):
     event = {
         "timestamp": timestamp,
         "sensor": "Wordpot",
-        "session_id": None,   # Wordpot does not have sessions
+        "session_id": None,  # Wordpot has no session concept
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
+        # prefer T-Pot internal IP as dest
         "dest_ip": src.get("t-pot_ip_int") or src.get("dest_ip"),
         "dest_port": src.get("dest_port"),
-        "protocol": "http",
+        "protocol": "http",  # Wordpot is HTTP/WordPress emu
         "eventid": None,
         "message": None,
         "url": src.get("url"),
@@ -75,7 +79,7 @@ def normalize_dionaea(src):
     event = {
         "timestamp": timestamp,
         "sensor": "Dionaea",
-        "session_id": None,   # Dionaea has no session identifiers
+        "session_id": None,  # no sessions, grouped by time later
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
         "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int"),
@@ -96,7 +100,7 @@ def normalize_suricata(src):
     event = {
         "timestamp": timestamp,
         "sensor": "Suricata",
-        "session_id": None,   # Suricata sessionized by time window later
+        "session_id": None,  # Suricata sessionized by time windows
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
         "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int"),
@@ -117,6 +121,7 @@ def normalize_suricata(src):
 # -----------------------------
 
 def get_date_from_timestamp(ts):
+    # ts example: "2025-11-11T13:36:46.602Z"
     if not ts:
         return "unknown"
     if "T" in ts:
@@ -145,6 +150,7 @@ def process_hits(hits, out_dict):
             norm = normalize_suricata(src)
             key = "suricata"
         else:
+            # Unknown / unhandled type, skip for now
             continue
 
         date_str = get_date_from_timestamp(norm["timestamp"])
@@ -158,7 +164,8 @@ def process_hits(hits, out_dict):
 def save_normalized(out_dict):
     for date_str in out_dict:
         day_dir = os.path.join(NORMALIZED_BASE, date_str)
-        os.makedirs(day_dir, exist_ok=True)
+        if not os.path.isdir(day_dir):
+            os.makedirs(day_dir, exist_ok=True)
 
         for sensor_key in out_dict[date_str]:
             out_path = os.path.join(day_dir, sensor_key + ".json")
@@ -175,6 +182,7 @@ def main():
     print("Using RAW_DIR:", ETL_DATA_DIR)
     print("Using NORMALIZED_BASE:", NORMALIZED_BASE)
 
+    # find latest raw honeypots and suricata files
     honeypots_path = find_latest_file("tpot_raw_honeypots_")
     suricata_path = find_latest_file("tpot_raw_suricata_")
 
@@ -184,16 +192,23 @@ def main():
 
     out_dict = {}
 
+    # process honeypots file
     if honeypots_path:
         print("Loading honeypots from:", honeypots_path)
         hits = load_json_file(honeypots_path)
         process_hits(hits, out_dict)
+    else:
+        print("No honeypots raw file found.")
 
+    # process suricata file
     if suricata_path:
         print("Loading suricata from:", suricata_path)
         hits = load_json_file(suricata_path)
         process_hits(hits, out_dict)
+    else:
+        print("No suricata raw file found.")
 
+    # save per-day, per-sensor files
     if out_dict:
         save_normalized(out_dict)
     else:
