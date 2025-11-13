@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import hashlib
 
 # Load .env
 load_dotenv()
@@ -118,30 +119,44 @@ def sessionize_suricata(events):
 
 def wrap_session(sensor, events_list):
     """
-    Convert a list of event dicts into a proper session object
-    suitable for AI Layer 1.
+    Convert a list of event dicts into a proper session object.
+    All sensors get a unified hashed session_id:
+        <prefix>_<12hex>
+    Example:
+        co_1f9a72c9ab3d
+        wo_7a3fc915b23e
+        di_4e87af98c012
+        su_61b2c56b9e44
     """
+
     if not events_list:
         return None
 
-    # Sort chronologically
+    # Sort events chronologically
     events_list.sort(key=lambda x: x["timestamp"])
 
-    # Extract session_id if present
-    session_id = None
-    for ev in events_list:
-        if ev.get("session_id"):
-            session_id = ev["session_id"]
-            break
-
-    if session_id is None:
-        # fallback: unique deterministic ID
-        session_id = f"{sensor}_{events_list[0]['timestamp']}"
-
-    src_ip = events_list[0].get("src_ip")
-    dest_ip = events_list[0].get("dest_ip")
+    # Extract key metadata
     start_time = events_list[0]["timestamp"]
     end_time = events_list[-1]["timestamp"]
+    src_ip = events_list[0].get("src_ip", "")
+    dest_ip = events_list[0].get("dest_ip", "")
+
+    # Deterministic hash seed
+    seed = (
+        sensor +
+        start_time +
+        end_time +
+        (src_ip or "") +
+        (dest_ip or "")
+    )
+
+    # SHA1, shortened to 12 hex chars
+    hashed = hashlib.sha1(seed.encode()).hexdigest()[:12]
+
+    # prefix per sensor
+    prefix = sensor[:2].lower()   # co, wo, di, su
+
+    session_id = f"{prefix}_{hashed}"
 
     return {
         "session_id": session_id,
