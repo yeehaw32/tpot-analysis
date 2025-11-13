@@ -113,6 +113,48 @@ def sessionize_suricata(events):
 
 
 # ---------------------------------------------------------------------------
+# Wrap raw event lists into proper session objects
+# ---------------------------------------------------------------------------
+
+def wrap_session(sensor, events_list):
+    """
+    Convert a list of event dicts into a proper session object
+    suitable for AI Layer 1.
+    """
+    if not events_list:
+        return None
+
+    # Sort chronologically
+    events_list.sort(key=lambda x: x["timestamp"])
+
+    # Extract session_id if present
+    session_id = None
+    for ev in events_list:
+        if ev.get("session_id"):
+            session_id = ev["session_id"]
+            break
+
+    if session_id is None:
+        # fallback: unique deterministic ID
+        session_id = f"{sensor}_{events_list[0]['timestamp']}"
+
+    src_ip = events_list[0].get("src_ip")
+    dest_ip = events_list[0].get("dest_ip")
+    start_time = events_list[0]["timestamp"]
+    end_time = events_list[-1]["timestamp"]
+
+    return {
+        "session_id": session_id,
+        "sensor": sensor.capitalize(),
+        "src_ip": src_ip,
+        "dest_ip": dest_ip,
+        "start_time": start_time,
+        "end_time": end_time,
+        "events": events_list,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Main processing pipeline
 # ---------------------------------------------------------------------------
 
@@ -153,12 +195,19 @@ def process_day(date_str):
         events = load_json(input_file)
 
         print(f"[INFO] Sessionizing {sensor} ({len(events)} events)...")
-        sessions = handler(events)
+        raw_sessions = handler(events)
+
+        # Wrap raw lists of events into proper session objects
+        wrapped_sessions = []
+        for sess in raw_sessions:
+            obj = wrap_session(sensor, sess)
+            if obj:
+                wrapped_sessions.append(obj)
 
         out_file = os.path.join(out_dir, f"{sensor}_sessions.json")
-        save_json(out_file, sessions)
+        save_json(out_file, wrapped_sessions)
 
-        print(f"[INFO] Saved {len(sessions)} {sensor} sessions -> {out_file}")
+        print(f"[INFO] Saved {len(wrapped_sessions)} {sensor} sessions -> {out_file}")
 
 
 # ---------------------------------------------------------------------------
