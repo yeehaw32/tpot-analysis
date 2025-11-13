@@ -1,7 +1,9 @@
 requests
 python-dateutil
 PyYAML
-python-dotenv   # <-- ADD THIS
+python-dotenv
 flask
 chromadb
 openai
+langchain
+langchain-openai
