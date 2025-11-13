@@ -29,13 +29,22 @@ def get_env_path(name: str, default: str) -> Path:
 
 def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]:
     """
-    Load all session JSON files for a given date from TPOT_SESSIONIZED_DIR.
-    We expect per-sensor files like:
-      <base_dir>/<date>/cowrie_sessions.json
-      <base_dir>/<date>/wordpot_sessions.json
-      <base_dir>/<date>/dionaea_sessions.json
-      <base_dir>/<date>/suricata_sessions.json
+    Load and flatten all session files.
     """
+
+    def flatten_sessions(obj):
+        """Recursively flatten lists until only dict sessions remain."""
+        flat = []
+        if isinstance(obj, dict):
+            # single session dict
+            flat.append(obj)
+        elif isinstance(obj, list):
+            for item in obj:
+                flat.extend(flatten_sessions(item))
+        else:
+            # unknown type – ignore
+            pass
+        return flat
 
     sessions: List[Dict[str, Any]] = []
 
@@ -50,15 +59,11 @@ def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]
         with filename.open("r", encoding="utf-8") as f:
             data = json.load(f)
 
-        # we expect a list of sessions in each file
-        if isinstance(data, list):
-            sessions.extend(data)
-        else:
-            # if someone saved a dict, try to handle that too
-            if "sessions" in data and isinstance(data["sessions"], list):
-                sessions.extend(data["sessions"])
+        flattened = flatten_sessions(data)
+        sessions.extend(flattened)
 
     return sessions
+
 
 
 def make_model() -> ChatOpenAI:
