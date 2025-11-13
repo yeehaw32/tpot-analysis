@@ -1,9 +1,8 @@
 import os
 import json
 
-RAW_DIR = os.getenv("RAW_DIR")
 NORMALIZED_BASE = os.getenv("NORMALIZED_BASE")
-
+ETL_DATA_DIR= os.getenv("ETL_DATA_DIR")
 
 def load_json_file(path):
     with open(path, "r") as f:
@@ -12,13 +11,13 @@ def load_json_file(path):
 
 def find_latest_file(prefix):
     files = []
-    for name in os.listdir(RAW_DIR):
+    for name in os.listdir(ETL_DATA_DIR):
         if name.startswith(prefix) and name.endswith(".json"):
             files.append(name)
     if not files:
         return None
     files.sort()
-    return os.path.join(RAW_DIR, files[-1])
+    return os.path.join(ETL_DATA_DIR, files[-1])
 
 
 def normalize_cowrie(src):
@@ -160,7 +159,7 @@ def save_normalized(out_dict):
 
 
 def main():
-    print("Using RAW_DIR:", RAW_DIR)
+    print("Using RAW_DIR:", ETL_DATA_DIR)
     print("Using NORMALIZED_BASE:", NORMALIZED_BASE)
 
     # find latest raw honeypots and suricata files
@@ -168,7 +167,7 @@ def main():
     suricata_path = find_latest_file("tpot_raw_suricata_")
 
     if not honeypots_path and not suricata_path:
-        print("No raw files found in", RAW_DIR)
+        print("No raw files found in", ETL_DATA_DIR)
         return
 
     out_dict = {}
