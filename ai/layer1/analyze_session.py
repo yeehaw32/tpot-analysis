@@ -148,21 +148,31 @@ def run_layer1_for_date(date_str: str) -> None:
     output_dir = get_env_path("TPOT_AI_LAYER1_DIR", "/data/tpot_sessions/ai_layer1")
 
     sessions = load_sessions_for_day(session_dir, date_str)
-    print(f"[INFO] Loaded {len(sessions)} sessions for {date_str} from {session_dir}")
+    total = len(sessions)
+
+    print(f"[INFO] Loaded {total} sessions for {date_str} from {session_dir}")
+
+    if total == 0:
+        print(f"[INFO] No sessions to process for {date_str}.")
+        return
 
     model = make_model()
 
     processed = 0
-    for session in sessions:
+    for idx, session in enumerate(sessions, start=1):
+        session_id = session.get("session_id", f"session_{idx}")
+
+        print(f"[AI-L1] Processing session {idx}/{total}: {session_id} ...")
+
         try:
             analysis = analyze_single_session(model, session)
             save_analysis(output_dir, date_str, session, analysis)
             processed += 1
         except Exception as e:
-            session_id = session.get("session_id", "unknown")
             print(f"[WARN] Failed to analyze session {session_id}: {e}")
 
-    print(f"[INFO] AI Layer 1 completed for {date_str}: {processed}/{len(sessions)} sessions processed.")
+    print(f"[INFO] AI Layer 1 completed for {date_str}: {processed}/{total} sessions processed.")
+
 
 
 if __name__ == "__main__":
