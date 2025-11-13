@@ -28,27 +28,19 @@ def get_env_path(name: str, default: str) -> Path:
 
 
 def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]:
-    """
-    Load and flatten all session files.
-    """
 
     def flatten_sessions(obj):
-        """Recursively flatten lists until only dict sessions remain."""
         flat = []
         if isinstance(obj, dict):
-            # single session dict
             flat.append(obj)
         elif isinstance(obj, list):
             for item in obj:
                 flat.extend(flatten_sessions(item))
-        else:
-            # unknown type – ignore
-            pass
         return flat
 
-    sessions: List[Dict[str, Any]] = []
-
+    sessions = []
     date_dir = base_dir / date_str
+
     if not date_dir.exists():
         raise FileNotFoundError(f"Session directory does not exist: {date_dir}")
 
@@ -60,9 +52,14 @@ def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]
             data = json.load(f)
 
         flattened = flatten_sessions(data)
-        sessions.extend(flattened)
+
+        # strict validation: keep only proper session objects
+        for obj in flattened:
+            if isinstance(obj, dict) and "session_id" in obj and "events" in obj:
+                sessions.append(obj)
 
     return sessions
+
 
 
 
