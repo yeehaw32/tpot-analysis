@@ -15,7 +15,6 @@ packages = [
     "ai.layer1",
     "ai.rag",
     "etl",
-    "scripts",
     "tests",
     "ui"
 ]
