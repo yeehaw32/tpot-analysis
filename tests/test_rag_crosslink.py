@@ -1,6 +1,6 @@
 # tests/rag_crosslink_test.py
 
-from ai.rag.query import enrich_session_with_mitre
+from ai.rag.mitre_query import enrich_session_with_mitre
 from ai.rag.sigma_query import enrich_session_with_sigma
 
 def extract_mitre_ids(mitre_candidates):
