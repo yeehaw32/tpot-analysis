@@ -1,5 +1,4 @@
 from ai.rag.query import enrich_session_with_mitre
-from ai.rag.query
 
 test = {
     "session_id": "x",
