@@ -1,4 +1,6 @@
-from ai.rag.mitre_query import enrich_session_with_mitre
+# tests/rag_sigma_test.py
+
+from ai.rag.sigma_query import enrich_session_with_sigma
 
 test = {
     "session_id": "x",
@@ -18,13 +20,11 @@ test = {
     },
     "confidence": 0.9,
     "risk_score": 7,
-    "timestamp_range": {"start": "2025-09-01", "end": "2025-09-01"}
+    "timestamp_range": {"start": "2025-09-01", "end": "2025-09-01"},
 }
 
-res = enrich_session_with_mitre(test, top_k=5)
+res = enrich_session_with_sigma(test, top_k=5)
 
-print("Number of candidates:", len(res["mitre_candidates"]))
-
-
-for item in res["mitre_candidates"]:
-    print(item)
+print("Number of Sigma candidates:", len(res["sigma_candidates"]))
+for cand in res["sigma_candidates"]:
+    print(cand)
