@@ -5,7 +5,9 @@ from pathlib import Path
 
 import chromadb
 from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+from load_dotenv import load_dotenv
 
+load_dotenv()
 
 def get_collection(chroma_path="./data/chroma/mitre"):
     """
@@ -14,7 +16,7 @@ def get_collection(chroma_path="./data/chroma/mitre"):
     """
     chroma_path = Path(chroma_path)
 
-    api_key = os.environ.get("OPENAI_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY environment variable is not set")
 
