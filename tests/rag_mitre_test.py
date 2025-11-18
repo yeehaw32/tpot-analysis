@@ -23,5 +23,8 @@ test = {
 
 res = enrich_session_with_mitre(test, top_k=5)
 
+print("Number of candidates:", len(res["mitre_candidates"]))
+
+
 for item in res["mitre_candidates"]:
     print(item)
