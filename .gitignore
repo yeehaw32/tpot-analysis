@@ -33,3 +33,4 @@ scripts/systemd/*.log
 # OS specific
 .DS_Store
 Thumbs.db
+chroma.sqlite3
