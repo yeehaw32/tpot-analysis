@@ -1,0 +1,21 @@
+[project]
+name = "tpot_analysis"
+version = "0.1.0"
+description = "RAG-enriched honeypot analysis pipeline"
+requires-python = ">=3.10"
+dependencies = [
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+# These are your actual Python packages
+packages = [
+    "ai",
+    "ai.layer1",
+    "ai.rag",
+    "etl",
+    "scripts",
+    "tests",
+    "ui"
+]
