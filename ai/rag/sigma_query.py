@@ -31,20 +31,29 @@ def get_sigma_collection(chroma_path="./data/chroma/sigma"):
 
 def build_sigma_query_text(session_summary: dict) -> str:
     """
-    Reuses the same structure as MITRE query builder to ensure consistent embedding behaviour.
+    Safe similarity-search query builder for Sigma lookup.
+    Mirrors MITRE version to keep embedding behaviour aligned.
     """
+
+    MAX_SUMMARY_CHARS = 1500
+    MAX_COMMANDS = 10
+    MAX_URLS = 10
+    MAX_SIGNATURES = 10
+
     parts = []
 
+    # Summary (truncate)
     summary = session_summary.get("summary", "")
-    if summary:
-        parts.append(summary)
+    parts.append(summary[:MAX_SUMMARY_CHARS])
 
-    attack_intent = session_summary.get("attack_intent", "")
-    if attack_intent:
-        parts.append(f"Attack intent: {attack_intent}")
+    # Attack intent
+    intent = session_summary.get("attack_intent")
+    if intent:
+        parts.append(f"Attack intent: {intent}")
 
     indicators = session_summary.get("key_indicators", {})
 
+    # IPs
     src_ip = indicators.get("src_ip")
     if src_ip:
         parts.append(f"Source IP: {src_ip}")
@@ -53,6 +62,7 @@ def build_sigma_query_text(session_summary: dict) -> str:
     if dest_ip:
         parts.append(f"Destination IP: {dest_ip}")
 
+    # Ports
     src_ports = indicators.get("src_ports", [])
     dest_ports = indicators.get("dest_ports", [])
     if src_ports:
@@ -60,26 +70,28 @@ def build_sigma_query_text(session_summary: dict) -> str:
     if dest_ports:
         parts.append("Destination ports: " + ", ".join(map(str, dest_ports)))
 
+    # Protocols
     protocols = indicators.get("protocols", [])
     if protocols:
         parts.append("Protocols: " + ", ".join(protocols))
 
-    commands = indicators.get("commands", [])
-    for cmd in commands:
-        parts.append("Command: " + str(cmd))
+    # Commands – truncated
+    for cmd in indicators.get("commands", [])[:MAX_COMMANDS]:
+        parts.append(f"Command: {cmd}")
 
-    urls = indicators.get("urls", [])
-    for url in urls:
-        parts.append("URL: " + str(url))
+    # URLs – truncated
+    for url in indicators.get("urls", [])[:MAX_URLS]:
+        parts.append(f"URL: {url}")
 
-    signatures = indicators.get("signatures", [])
-    for sig in signatures:
-        parts.append("Signature: " + str(sig))
+    # Suricata signatures – truncated
+    for sig in indicators.get("signatures", [])[:MAX_SIGNATURES]:
+        parts.append(f"Signature: {sig}")
 
-    files = indicators.get("files", [])
-    for f in files:
-        parts.append("File: " + str(f))
+    # Files
+    for f in indicators.get("files", []):
+        parts.append(f"File: {f}")
 
+    # Timestamp range
     ts = session_summary.get("timestamp_range", {})
     start_ts = ts.get("start")
     end_ts = ts.get("end")
@@ -90,6 +102,7 @@ def build_sigma_query_text(session_summary: dict) -> str:
         return "Empty session summary"
 
     return "\n".join(parts)
+
 
 
 def query_sigma_for_session(session_summary, top_k=5, chroma_path="./data/chroma/sigma"):

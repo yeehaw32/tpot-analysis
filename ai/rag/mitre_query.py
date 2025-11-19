@@ -36,27 +36,30 @@ def get_collection(chroma_path="./data/chroma/mitre"):
 
 def build_query_text(session_summary: dict) -> str:
     """
-    Build a robust similarity-search query string from a Layer 1 session summary.
-
-    This function uses only fields defined in make_layer1_result_template().
-    Nothing outside that structure is assumed.
+    Build a safe similarity-search query string for MITRE lookup.
+    Prevents embedding overflow by truncating long fields.
     """
+
+    MAX_SUMMARY_CHARS = 1500
+    MAX_COMMANDS = 10
+    MAX_URLS = 10
+    MAX_SIGNATURES = 10
 
     parts = []
 
-    # 1) Base human-readable summary (LLM output)
+    # Summary (truncate)
     summary = session_summary.get("summary", "")
     if summary:
-        parts.append(summary)
+        parts.append(summary[:MAX_SUMMARY_CHARS])
 
-    # 2) Attack intent (e.g. ssh_bruteforce, malware_drop, etc.)
-    attack_intent = session_summary.get("attack_intent", "")
-    if attack_intent:
-        parts.append(f"Attack intent: {attack_intent}")
+    # Attack intent
+    intent = session_summary.get("attack_intent")
+    if intent:
+        parts.append(f"Attack intent: {intent}")
 
-    # 3) Key indicators
     indicators = session_summary.get("key_indicators", {})
 
+    # IPs
     src_ip = indicators.get("src_ip")
     if src_ip:
         parts.append(f"Source IP: {src_ip}")
@@ -73,43 +76,39 @@ def build_query_text(session_summary: dict) -> str:
     if dest_ports:
         parts.append("Destination ports: " + ", ".join(map(str, dest_ports)))
 
-    # Protocols (e.g. tcp, udp, http)
+    # Protocols
     protocols = indicators.get("protocols", [])
     if protocols:
         parts.append("Protocols: " + ", ".join(protocols))
 
-    # Commands (Cowrie)
-    commands = indicators.get("commands", [])
-    for cmd in commands:
-        parts.append("Command: " + str(cmd))
+    # Commands – truncated
+    for cmd in indicators.get("commands", [])[:MAX_COMMANDS]:
+        parts.append(f"Command: {cmd}")
 
-    # URLs (HTTP honeypots)
-    urls = indicators.get("urls", [])
-    for url in urls:
-        parts.append("URL: " + str(url))
+    # URLs – truncated
+    for url in indicators.get("urls", [])[:MAX_URLS]:
+        parts.append(f"URL: {url}")
 
-    # Suricata signatures
-    signatures = indicators.get("signatures", [])
-    for sig in signatures:
-        parts.append("Signature: " + str(sig))
+    # Suricata signatures – truncated
+    for sig in indicators.get("signatures", [])[:MAX_SIGNATURES]:
+        parts.append(f"Signature: {sig}")
 
-    # Files / paths / hashes
-    files = indicators.get("files", [])
-    for f in files:
-        parts.append("File: " + str(f))
+    # Files
+    for f in indicators.get("files", []):
+        parts.append(f"File: {f}")
 
-    # 4) Timestamp range — helps similarity without adding noise
+    # Timestamp range
     ts = session_summary.get("timestamp_range", {})
     start_ts = ts.get("start")
     end_ts = ts.get("end")
     if start_ts or end_ts:
         parts.append(f"Time range: {start_ts} → {end_ts}")
 
-    # If nothing was added (shouldn't happen), fall back to placeholder
     if not parts:
         return "Empty session summary"
 
     return "\n".join(parts)
+
 
 
 
