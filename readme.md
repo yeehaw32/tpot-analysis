@@ -80,7 +80,7 @@ Output:
 ## 4. Sessionize
 
 ```bash
-python etl/sessionize.py data/tpot_sessions/normalized25-11-11
+python etl/sessionize.py 25-11-11
 ```
 
 Creates:
