@@ -11,29 +11,31 @@ from load_dotenv import load_dotenv
 
 load_dotenv()
 
+# Regex for parsing the ET-style Suricata rules inside the merged suricata.rules file
 RULE_PATTERN = re.compile(
     r'alert\s+(\w+)\s+(.+?)\s+(\w+)\s+->\s+(.+?)\s+\((.+)\)'
 )
 
+
 def parse_metadata_block(block):
     """
-    Parse metadata: key value, key value, ...; into a dict.
-    Example: metadata:affected_product Any, attack_target Any, tag TOR, signature_severity Informational;
+    Parse ET-style metadata into a dict:
+    metadata: key value, key value, ...
     """
     meta = {}
     block = block.strip().rstrip(';')
     items = [item.strip() for item in block.split(',')]
     for item in items:
-        if ' ' in item:
-            key, val = item.split(' ', 1)
+        if " " in item:
+            key, val = item.split(" ", 1)
             meta[key.strip()] = val.strip()
     return meta
 
 
 def parse_rule(line):
     """
-    Parse a single Suricata rule into structured metadata.
-    Handles the ET Open rule format inside suricata.rules.
+    Parse one Suricata rule line into a structured dict.
+    Only handles single-line rules (suricata-update default output).
     """
     line = line.strip()
     if not line.startswith("alert "):
@@ -49,7 +51,7 @@ def parse_rule(line):
     dest_addrs = m.group(4)
 
     body = m.group(5)
-    body_parts = [p.strip() for p in body.split(';') if p.strip()]
+    body_parts = [p.strip() for p in body.split(";") if p.strip()]
 
     msg = None
     classtype = None
@@ -110,6 +112,30 @@ def parse_rule(line):
     }
 
 
+def normalize_metadata(rule):
+    """
+    Convert rule dict into ChromaDB-safe metadata:
+    - remove raw_rule
+    - lists -> comma-separated strings
+    - dict -> JSON string
+    """
+    out = {}
+    for k, v in rule.items():
+        if k == "raw_rule":
+            continue  # raw text goes into embedding document, not metadata
+
+        if isinstance(v, list):
+            out[k] = ", ".join(v)
+
+        elif isinstance(v, dict):
+            out[k] = json.dumps(v)
+
+        else:
+            out[k] = v
+
+    return out
+
+
 def ingest_suricata_rules(
     rule_file,
     chroma_path="./data/chroma/suricata",
@@ -119,7 +145,7 @@ def ingest_suricata_rules(
     chroma_path = Path(chroma_path)
     chroma_path.mkdir(parents=True, exist_ok=True)
 
-    api_key = os.environ.get("OPENAI_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY environment variable is not set")
 
@@ -138,25 +164,26 @@ def ingest_suricata_rules(
     rules = []
     with rule_file.open("r", encoding="utf-8") as f:
         for line in f:
-            r = parse_rule(line)
-            if r and r.get("sid") and r.get("msg"):
-                rules.append(r)
+            parsed = parse_rule(line)
+            if parsed and parsed.get("sid") and parsed.get("msg"):
+                rules.append(parsed)
 
     print(f"Parsed {len(rules)} Suricata rules")
 
+    # Batch ingestion
     for i in range(0, len(rules), batch_size):
         batch = rules[i:i + batch_size]
 
         ids = [f"suricata-{r['sid']}" for r in batch]
         docs = [f"{r['msg']} {r['raw_rule']}" for r in batch]
-        metas = batch
+        metas = [normalize_metadata(r) for r in batch]
 
-        print(f"Ingesting batch {i//batch_size+1} ({len(ids)} rules)")
+        print(f"Ingesting batch {i//batch_size + 1} ({len(ids)} rules)")
 
         collection.add(
             ids=ids,
             documents=docs,
-            metadatas=metas
+            metadatas=metas,
         )
 
     print("Ingestion complete!")
@@ -165,8 +192,8 @@ def ingest_suricata_rules(
 if __name__ == "__main__":
     import argparse
 
-    p = argparse.ArgumentParser()
-    p.add_argument("rule_file", help="Path to suricata.rules on Analysis VM")
+    p = argparse.ArgumentParser(description="Ingest Suricata rules into ChromaDB")
+    p.add_argument("rule_file", help="Path to suricata.rules")
     p.add_argument("--chroma-path", default="./data/chroma/suricata")
     args = p.parse_args()
 
