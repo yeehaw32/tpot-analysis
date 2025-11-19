@@ -113,27 +113,31 @@ def parse_rule(line):
 
 
 def normalize_metadata(rule):
-    """
-    Convert rule dict into ChromaDB-safe metadata:
-    - remove raw_rule
-    - lists -> comma-separated strings
-    - dict -> JSON string
-    """
     out = {}
     for k, v in rule.items():
         if k == "raw_rule":
-            continue  # raw text goes into embedding document, not metadata
+            continue  # raw text goes into embedding doc
 
+        # Convert None → "" so Chroma accepts it
+        if v is None:
+            out[k] = ""
+            continue
+
+        # List → comma-separated string
         if isinstance(v, list):
             out[k] = ", ".join(v)
+            continue
 
-        elif isinstance(v, dict):
+        # Dict → JSON string
+        if isinstance(v, dict):
             out[k] = json.dumps(v)
+            continue
 
-        else:
-            out[k] = v
+        # Everything else must be primitive (str/int/bool/float)
+        out[k] = v
 
     return out
+
 
 
 def ingest_suricata_rules(
