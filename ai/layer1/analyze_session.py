@@ -74,21 +74,20 @@ def make_model() -> ChatOpenAI:
 def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, Any]:
     """
     Deterministically extract key_indicators from the session events.
-    This uses only data already present in the session object
-    (normalized + sessionized), no external knowledge.
+    Only extracts REAL attacker commands for Cowrie.
     """
 
     src_ip = session.get("src_ip", "")
     dest_ip = session.get("dest_ip", "")
     sensor = session.get("sensor", "")
 
-    src_ports: List[Any] = []
-    dest_ports: List[Any] = []
-    protocols: List[str] = []
-    commands: List[str] = []
-    urls: List[str] = []
-    signatures: List[str] = []
-    files: List[str] = []
+    src_ports = []
+    dest_ports = []
+    protocols = []
+    commands = []
+    urls = []
+    signatures = []
+    files = []
 
     events = session.get("events", [])
 
@@ -107,50 +106,46 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
         if proto and proto not in protocols:
             protocols.append(proto)
 
-        # URLs from explicit field (Wordpot, Dionaea, etc.)
+        # URLs from explicit fields (Wordpot/Dionaea)
         u = event.get("url")
         if u and u not in urls:
             urls.append(u)
 
         # ------------------------------------------------------------------
-        # COWRIE — CORRECT COMMAND EXTRACTION
+        # COWRIE: EXTRACT ONLY TRUE COMMANDS
         # ------------------------------------------------------------------
-        if sensor == "Cowrie":
-            if event.get("eventid") == "cowrie.command.input":
-                raw_obj = event.get("raw", {})
-                real_cmd = raw_obj.get("input")
+        if sensor == "Cowrie" and event.get("eventid") == "cowrie.command.input":
+            raw_obj = event.get("raw", {})
+            real_cmd = raw_obj.get("input")
 
-                # Real attacker command
-                if real_cmd and real_cmd not in commands:
-                    commands.append(real_cmd)
+            # Real attacker command only
+            if real_cmd and real_cmd not in commands:
+                commands.append(real_cmd)
 
-                # Extract URLs from command text
-                if real_cmd:
-                    for part in real_cmd.split():
-                        if part.startswith("http://") or part.startswith("https://"):
-                            if part not in urls:
-                                urls.append(part)
+            # URLs inside attacker command
+            for part in real_cmd.split():
+                if part.startswith(("http://", "https://")):
+                    if part not in urls:
+                        urls.append(part)
 
-                # Extract files from "-O <file>" pattern
-                if real_cmd and "-O " in real_cmd:
-                    after = real_cmd.split("-O ", 1)[1].strip()
-                    if after:
-                        file_path = after.split()[0]
-                        if file_path not in files:
-                            files.append(file_path)
+            # File extraction: "-O <file>"
+            if "-O " in real_cmd:
+                after = real_cmd.split("-O ", 1)[1].strip()
+                if after:
+                    file_path = after.split()[0]
+                    if file_path not in files:
+                        files.append(file_path)
 
         # ------------------------------------------------------------------
-        # SURICATA — SIGNATURES
+        # SURICATA SIGNATURES
         # ------------------------------------------------------------------
         if sensor == "Suricata":
             sig_list = event.get("signatures", [])
-            if sig_list:
-                for s in sig_list:
-                    if s and s not in signatures:
-                        signatures.append(s)
+            for s in sig_list:
+                if s and s not in signatures:
+                    signatures.append(s)
 
-    # Final return structure
-    indicators = {
+    return {
         "src_ip": src_ip,
         "dest_ip": dest_ip,
         "src_ports": src_ports,
@@ -162,7 +157,6 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
         "files": files,
     }
 
-    return indicators
 
 
 
