@@ -107,41 +107,41 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
         if proto and proto not in protocols:
             protocols.append(proto)
 
-        # URLs from explicit field (covers Wordpot and others)
+        # URLs from explicit field (Wordpot, Dionaea, etc.)
         u = event.get("url")
         if u and u not in urls:
             urls.append(u)
 
-        # Cowrie-specific extraction from message
-        msg = event.get("message")
+        # ------------------------------------------------------------------
+        # COWRIE — CORRECT COMMAND EXTRACTION
+        # ------------------------------------------------------------------
         if sensor == "Cowrie":
-            if msg:
-                if msg not in commands:
-                    commands.append(msg)
+            if event.get("eventid") == "cowrie.command.input":
+                raw_obj = event.get("raw", {})
+                real_cmd = raw_obj.get("input")
 
-                # crude URL extraction from command text
-                idx = msg.find("http://")
-                if idx == -1:
-                    idx = msg.find("https://")
-                if idx != -1:
-                    end = idx
-                    while end < len(msg) and not msg[end].isspace():
-                        end += 1
-                    url_str = msg[idx:end]
-                    if url_str and url_str not in urls:
-                        urls.append(url_str)
+                # Real attacker command
+                if real_cmd and real_cmd not in commands:
+                    commands.append(real_cmd)
 
-                # simple file extraction for "-O <file>" pattern
-                pattern = "-O "
-                pos = msg.find(pattern)
-                if pos != -1:
-                    rest = msg[pos + len(pattern):].strip()
-                    if rest:
-                        file_path = rest.split()[0]
-                        if file_path and file_path not in files:
+                # Extract URLs from command text
+                if real_cmd:
+                    for part in real_cmd.split():
+                        if part.startswith("http://") or part.startswith("https://"):
+                            if part not in urls:
+                                urls.append(part)
+
+                # Extract files from "-O <file>" pattern
+                if real_cmd and "-O " in real_cmd:
+                    after = real_cmd.split("-O ", 1)[1].strip()
+                    if after:
+                        file_path = after.split()[0]
+                        if file_path not in files:
                             files.append(file_path)
 
-        # Suricata signatures (from normalized fields)
+        # ------------------------------------------------------------------
+        # SURICATA — SIGNATURES
+        # ------------------------------------------------------------------
         if sensor == "Suricata":
             sig_list = event.get("signatures", [])
             if sig_list:
@@ -149,6 +149,7 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
                     if s and s not in signatures:
                         signatures.append(s)
 
+    # Final return structure
     indicators = {
         "src_ip": src_ip,
         "dest_ip": dest_ip,
@@ -162,6 +163,7 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
     }
 
     return indicators
+
 
 
 def analyze_single_session(model: ChatOpenAI, session: Dict[str, Any]) -> Dict[str, Any]:
