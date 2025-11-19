@@ -68,6 +68,23 @@ def query_suricata_semantic(text, top_k=5, chroma_path="./data/chroma/suricata")
 
     return out
 
+def enrich_session_with_suricata(session):
+    """
+    Attach Suricata rule metadata for any extracted signatures
+    from AI-Layer-1.
+    """
+    sigs = session.get("key_indicators", {}).get("signatures", [])
+    out = []
+
+    for sid in sigs:
+        rule = query_suricata_by_sid(sid)
+        if rule:
+            out.append(rule)
+
+    session["suricata_alerts"] = out
+    return session
+
+
 
 if __name__ == "__main__":
     # Basic self-test
