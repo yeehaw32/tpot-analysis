@@ -14,7 +14,6 @@ from prompts import (
     build_layer1_user_prompt,
 )
 
-
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -53,7 +52,6 @@ def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]
 
         flattened = flatten_sessions(data)
 
-        # strict validation: keep only proper session objects
         for obj in flattened:
             if isinstance(obj, dict) and "session_id" in obj and "events" in obj:
                 sessions.append(obj)
@@ -61,19 +59,109 @@ def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]
     return sessions
 
 
-
-
 def make_model() -> ChatOpenAI:
     """
     Create the LangChain ChatOpenAI model for AI Layer 1.
     We use gpt-4o-mini for cost efficiency.
     """
-
     model = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0.1,
     )
     return model
+
+
+def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Deterministically extract key_indicators from the session events.
+    This uses only data already present in the session object
+    (normalized + sessionized), no external knowledge.
+    """
+
+    src_ip = session.get("src_ip", "")
+    dest_ip = session.get("dest_ip", "")
+    sensor = session.get("sensor", "")
+
+    src_ports: List[Any] = []
+    dest_ports: List[Any] = []
+    protocols: List[str] = []
+    commands: List[str] = []
+    urls: List[str] = []
+    signatures: List[str] = []
+    files: List[str] = []
+
+    events = session.get("events", [])
+
+    for event in events:
+        # Ports
+        sp = event.get("src_port")
+        if sp is not None and sp not in src_ports:
+            src_ports.append(sp)
+
+        dp = event.get("dest_port")
+        if dp is not None and dp not in dest_ports:
+            dest_ports.append(dp)
+
+        # Protocols
+        proto = event.get("protocol")
+        if proto and proto not in protocols:
+            protocols.append(proto)
+
+        # URLs from explicit field (covers Wordpot and others)
+        u = event.get("url")
+        if u and u not in urls:
+            urls.append(u)
+
+        # Cowrie-specific extraction from message
+        msg = event.get("message")
+        if sensor == "Cowrie":
+            if msg:
+                if msg not in commands:
+                    commands.append(msg)
+
+                # crude URL extraction from command text
+                idx = msg.find("http://")
+                if idx == -1:
+                    idx = msg.find("https://")
+                if idx != -1:
+                    end = idx
+                    while end < len(msg) and not msg[end].isspace():
+                        end += 1
+                    url_str = msg[idx:end]
+                    if url_str and url_str not in urls:
+                        urls.append(url_str)
+
+                # simple file extraction for "-O <file>" pattern
+                pattern = "-O "
+                pos = msg.find(pattern)
+                if pos != -1:
+                    rest = msg[pos + len(pattern):].strip()
+                    if rest:
+                        file_path = rest.split()[0]
+                        if file_path and file_path not in files:
+                            files.append(file_path)
+
+        # Suricata signatures (from normalized fields)
+        if sensor == "Suricata":
+            sig_list = event.get("signatures", [])
+            if sig_list:
+                for s in sig_list:
+                    if s and s not in signatures:
+                        signatures.append(s)
+
+    indicators = {
+        "src_ip": src_ip,
+        "dest_ip": dest_ip,
+        "src_ports": src_ports,
+        "dest_ports": dest_ports,
+        "protocols": protocols,
+        "commands": commands,
+        "urls": urls,
+        "signatures": signatures,
+        "files": files,
+    }
+
+    return indicators
 
 
 def analyze_single_session(model: ChatOpenAI, session: Dict[str, Any]) -> Dict[str, Any]:
@@ -97,8 +185,6 @@ def analyze_single_session(model: ChatOpenAI, session: Dict[str, Any]) -> Dict[s
     try:
         result = json.loads(content)
     except json.JSONDecodeError:
-        # If the model adds extra text, try a naive fix by extracting the first JSON block
-        # This is a simple fallback; you can improve later if needed.
         start_idx = content.find("{")
         end_idx = content.rfind("}")
         if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
@@ -107,16 +193,31 @@ def analyze_single_session(model: ChatOpenAI, session: Dict[str, Any]) -> Dict[s
         else:
             raise ValueError(f"Model did not return valid JSON. Content was:\n{content}")
 
-    # Optionally merge with template to ensure fields exist
+    # Start from schema template (ensures all fields exist)
     template = make_layer1_result_template(session)
     merged = template
 
-    # update top-level keys, but keep template defaults if missing
+    # Merge model output into template
     for key, value in result.items():
         if key in merged and isinstance(value, dict) and isinstance(merged[key], dict):
             merged[key].update(value)
         else:
             merged[key] = value
+
+    # Deterministic key_indicators from session events (override model guesses)
+    static_indicators = extract_key_indicators_from_session(session)
+
+    if "key_indicators" not in merged or not isinstance(merged["key_indicators"], dict):
+        merged["key_indicators"] = static_indicators
+    else:
+        for k, v in static_indicators.items():
+            # Only overwrite when we have a non-empty deterministic value
+            if k in ["src_ip", "dest_ip"]:
+                if v:  # non-empty string
+                    merged["key_indicators"][k] = v
+            else:
+                if isinstance(v, list) and len(v) > 0:
+                    merged["key_indicators"][k] = v
 
     return merged
 
@@ -174,14 +275,11 @@ def run_layer1_for_date(date_str: str) -> None:
     print(f"[INFO] AI Layer 1 completed for {date_str}: {processed}/{total} sessions processed.")
 
 
-
 if __name__ == "__main__":
-    # Example usage:
-    #   python -m AI.layer1.analyze_session 2025-11-11
     import sys
 
     if len(sys.argv) != 2:
-        print("Usage: python -m AI.layer1.analyze_session <YYYY-MM-DD>")
+        print("Usage: python ai/layer1/analyze_session.py <YYYY-MM-DD>")
         sys.exit(1)
 
     date_arg = sys.argv[1]

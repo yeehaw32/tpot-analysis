@@ -97,23 +97,44 @@ def normalize_dionaea(src):
 
 def normalize_suricata(src):
     timestamp = src.get("@timestamp") or src.get("timestamp")
+
+    alert = src.get("alert", {}) or {}
+
+    signature = alert.get("signature")
+    signature_id = alert.get("signature_id")
+    category = alert.get("category")
+    severity = alert.get("severity")
+
     event = {
         "timestamp": timestamp,
         "sensor": "Suricata",
         "session_id": None,  # Suricata sessionized by time windows
+
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
         "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int"),
         "dest_port": src.get("dest_port"),
+
         "protocol": src.get("proto"),
+        "event_type": src.get("event_type"),
+
+        # NEW FIELDS (critical fix)
+        "signatures": [signature] if signature else [],
+        "signature_ids": [signature_id] if signature_id else [],
+        "categories": [category] if category else [],
+        "severities": [severity] if severity else [],
+
+        # placeholders for consistency
         "eventid": None,
         "message": None,
         "url": None,
         "connection": None,
-        "event_type": src.get("event_type"),
+
         "raw": src,
     }
+
     return event
+
 
 
 # -----------------------------
