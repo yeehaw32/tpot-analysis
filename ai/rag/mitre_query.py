@@ -36,68 +36,73 @@ def get_collection(chroma_path="./data/chroma/mitre"):
 
 def build_query_text(session_summary: dict) -> str:
     """
-    Build a safe similarity-search query string for MITRE lookup.
-    Prevents embedding overflow by truncating long fields.
+    Build a safe similarity-search query string for RAG embedding.
+    Truncates long lists to avoid hitting model context limits.
+    Stored session data remains unaffected.
     """
 
-    MAX_SUMMARY_CHARS = 1500
-    MAX_COMMANDS = 10
-    MAX_URLS = 10
-    MAX_SIGNATURES = 10
+    MAX_SUMMARY_CHARS = 1200
+    MAX_PORTS = 8
+    MAX_COMMANDS = 8
+    MAX_URLS = 8
+    MAX_SIGNATURES = 8
+    MAX_FILES = 8
 
     parts = []
 
-    # Summary (truncate)
+    # Summary
     summary = session_summary.get("summary", "")
     if summary:
         parts.append(summary[:MAX_SUMMARY_CHARS])
 
-    # Attack intent
+    # Intent
     intent = session_summary.get("attack_intent")
     if intent:
         parts.append(f"Attack intent: {intent}")
 
     indicators = session_summary.get("key_indicators", {})
 
-    # IPs
-    src_ip = indicators.get("src_ip")
-    if src_ip:
-        parts.append(f"Source IP: {src_ip}")
+    # Simple fields
+    if indicators.get("src_ip"):
+        parts.append(f"Source IP: {indicators['src_ip']}")
+    if indicators.get("dest_ip"):
+        parts.append(f"Destination IP: {indicators['dest_ip']}")
 
-    dest_ip = indicators.get("dest_ip")
-    if dest_ip:
-        parts.append(f"Destination IP: {dest_ip}")
-
-    # Ports
+    # Ports (truncate)
     src_ports = indicators.get("src_ports", [])
-    dest_ports = indicators.get("dest_ports", [])
     if src_ports:
-        parts.append("Source ports: " + ", ".join(map(str, src_ports)))
+        parts.append("Source ports: " + ", ".join(map(str, src_ports[:MAX_PORTS])))
+
+    dest_ports = indicators.get("dest_ports", [])
     if dest_ports:
-        parts.append("Destination ports: " + ", ".join(map(str, dest_ports)))
+        parts.append("Destination ports: " + ", ".join(map(str, dest_ports[:MAX_PORTS])))
 
-    # Protocols
-    protocols = indicators.get("protocols", [])
-    if protocols:
-        parts.append("Protocols: " + ", ".join(protocols))
+    # Protocols (small lists normally)
+    prots = indicators.get("protocols", [])
+    if prots:
+        parts.append("Protocols: " + ", ".join(prots))
 
-    # Commands – truncated
-    for cmd in indicators.get("commands", [])[:MAX_COMMANDS]:
-        parts.append(f"Command: {cmd}")
+    # Commands (truncate)
+    cmds = indicators.get("commands", [])
+    for c in cmds[:MAX_COMMANDS]:
+        parts.append("Command: " + str(c))
 
-    # URLs – truncated
-    for url in indicators.get("urls", [])[:MAX_URLS]:
-        parts.append(f"URL: {url}")
+    # URLs (truncate)
+    urls = indicators.get("urls", [])
+    for u in urls[:MAX_URLS]:
+        parts.append("URL: " + u)
 
-    # Suricata signatures – truncated
-    for sig in indicators.get("signatures", [])[:MAX_SIGNATURES]:
-        parts.append(f"Signature: {sig}")
+    # Suricata signatures (truncate)
+    sigs = indicators.get("signatures", [])
+    for s in sigs[:MAX_SIGNATURES]:
+        parts.append("Signature: " + str(s))
 
-    # Files
-    for f in indicators.get("files", []):
-        parts.append(f"File: {f}")
+    # Files (truncate)
+    files = indicators.get("files", [])
+    for f in files[:MAX_FILES]:
+        parts.append("File: " + str(f))
 
-    # Timestamp range
+    # Time range
     ts = session_summary.get("timestamp_range", {})
     start_ts = ts.get("start")
     end_ts = ts.get("end")
