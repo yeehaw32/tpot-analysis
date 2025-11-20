@@ -42,7 +42,8 @@ body {
     font-size: 14px;
 }
 
-.header-right input[type="date"] {
+.header-right input[type="date"],
+.sensor-filter select {
     padding: 4px 6px;
     background: #020617;
     border: 1px solid #374151;
@@ -70,6 +71,8 @@ body {
     min-height: 0;
 }
 
+/* LEFT PANEL */
+
 .sessions-panel {
     width: 32%;
     border-right: 1px solid #1f2937;
@@ -79,16 +82,18 @@ body {
     min-height: 0;
 }
 
-.detail-panel {
-    flex: 1;
-    padding: 10px 16px;
-    overflow-y: auto;
+.sessions-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
 }
 
-.sessions-panel h2,
-.detail-panel h2 {
-    margin: 0 0 8px;
-    font-size: 16px;
+.sensor-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
 }
 
 .sessions-list {
@@ -126,11 +131,6 @@ body {
 .session-item-header .sensor {
     color: #a5b4fc;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.session-item-header .session-id {
-    color: #9ca3af;
 }
 
 .session-item-meta {
@@ -151,6 +151,14 @@ body {
 .session-item-summary {
     font-size: 12px;
     color: #d1d5db;
+}
+
+/* RIGHT PANEL */
+
+.detail-panel {
+    flex: 1;
+    padding: 10px 16px;
+    overflow-y: auto;
 }
 
 .session-detail {
@@ -241,7 +249,7 @@ pre {
     display: none;
 }
 
-/* Modal */
+/* MODAL */
 
 .modal {
     position: fixed;
@@ -293,6 +301,8 @@ pre {
 .modal-close:hover {
     color: #e5e7eb;
 }
+
+/* MOBILE */
 
 @media (max-width: 900px) {
     .main {

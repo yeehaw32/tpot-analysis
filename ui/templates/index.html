@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Honeypot Review UI</title>
+    <title>Honeypot Session Review</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -12,6 +12,7 @@
             <h1>Honeypot Session Review</h1>
             <p>ETL → AI Layer 1 → RAG-enriched sessions</p>
         </div>
+
         <div class="header-right">
             <label for="date-input">Date:</label>
             <input type="date" id="date-input" value="{{ default_date }}">
@@ -20,23 +21,41 @@
     </header>
 
     <main class="main">
+
+        <!-- LEFT SIDE -->
         <section class="sessions-panel">
-            <h2>Sessions</h2>
+            <div class="sessions-panel-header">
+                <h2>Sessions</h2>
+
+                <div class="sensor-filter">
+                    <label for="sensor-filter">Filter:</label>
+                    <select id="sensor-filter">
+                        <option value="all">All</option>
+                        <option value="Cowrie">Cowrie</option>
+                        <option value="Dionaea">Dionaea</option>
+                        <option value="Wordpot">Wordpot</option>
+                        <option value="Suricata">Suricata</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="sessions-list" class="sessions-list">
                 <!-- Filled by JS -->
             </div>
         </section>
 
+        <!-- RIGHT SIDE -->
         <section class="detail-panel">
             <h2>Session detail</h2>
             <div id="session-detail" class="session-detail">
                 <p>Select a session to view details.</p>
             </div>
         </section>
+
     </main>
 </div>
 
-<!-- Sigma modal -->
+<!-- SIGMA MODAL -->
 <div id="sigma-modal" class="modal hidden">
     <div class="modal-backdrop" id="sigma-modal-backdrop"></div>
     <div class="modal-content">
