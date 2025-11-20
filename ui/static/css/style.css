@@ -335,3 +335,9 @@ code.language-yaml {
         max-height: 40vh;
     }
 }
+
+#sigma-modal-body.hljs {
+    font-family: monospace;
+    white-space: pre;
+}
+
