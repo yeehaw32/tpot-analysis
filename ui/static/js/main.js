@@ -293,44 +293,43 @@ async function openSigmaModal(sid) {
         const data = await fetchJSON(`/api/sigma/${encodeURIComponent(sid)}`);
         const meta = data.metadata || {};
 
-        // Be robust: try all possible fields where YAML might live
         const yaml =
-            data.yaml ||          // if backend returns { "yaml": "..." }
-            meta.yaml_raw ||      // if stored in metadata
-            data.document ||      // if YAML is the Chroma document
+            data.yaml ||
+            meta.yaml_raw ||
+            data.document ||
             "No YAML content available";
 
-        // Save plain text for copy-to-clipboard
         const plainYaml = yaml;
 
+        // Highlight.js version
         if (window.hljs) {
-            // Let highlight.js parse and color the YAML
             const result = hljs.highlight(yaml, { language: "yaml" });
             body.innerHTML = result.value;
             body.classList.add("hljs", "language-yaml");
+
+            // ⭐ THE IMPORTANT LINE ⭐
+            hljs.highlightElement(body);
         } else {
-            // Fallback if highlight.js not loaded
             body.textContent = yaml;
         }
 
-        // Copy button
-        if (copyBtn) {
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(plainYaml)
-                    .then(() => {
-                        copyBtn.textContent = "Copied!";
-                        setTimeout(() => { copyBtn.textContent = "Copy to clipboard"; }, 1500);
-                    })
-                    .catch(() => {
-                        copyBtn.textContent = "Copy failed";
-                        setTimeout(() => { copyBtn.textContent = "Copy to clipboard"; }, 1500);
-                    });
-            };
-        }
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(plainYaml)
+                .then(() => {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => copyBtn.textContent="Copy to clipboard", 1200);
+                })
+                .catch(() => {
+                    copyBtn.textContent = "Copy failed";
+                    setTimeout(() => copyBtn.textContent="Copy to clipboard", 1200);
+                });
+        };
+
     } catch (err) {
         body.textContent = `Error loading Sigma rule: ${err.message}`;
     }
 }
+
 
 
 
