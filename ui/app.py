@@ -20,8 +20,9 @@ app = Flask(
 
 # Embedded ChromaDB client on Analysis VM
 chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
-sigma_collection = chroma_client.get_collection("sigma")
+sigma_collection = chroma_client.get_or_create_collection("sigma")
 mitre_collection = chroma_client.get_or_create_collection("mitre")
+suricata_collection = chroma_client.get_collection("suricata")
 
 
 def today_str():
