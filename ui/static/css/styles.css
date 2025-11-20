@@ -1,0 +1,307 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #020617;
+    border-bottom: 1px solid #1f2937;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.header p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.header-right input[type="date"] {
+    padding: 4px 6px;
+    background: #020617;
+    border: 1px solid #374151;
+    color: #e5e7eb;
+    border-radius: 4px;
+}
+
+.header-right button {
+    padding: 5px 12px;
+    background: #2563eb;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.header-right button:hover {
+    background: #1d4ed8;
+}
+
+.main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.sessions-panel {
+    width: 32%;
+    border-right: 1px solid #1f2937;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.detail-panel {
+    flex: 1;
+    padding: 10px 16px;
+    overflow-y: auto;
+}
+
+.sessions-panel h2,
+.detail-panel h2 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.sessions-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.session-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #020617;
+    border: 1px solid #1f2937;
+    cursor: pointer;
+}
+
+.session-item:hover {
+    border-color: #2563eb;
+}
+
+.session-item.selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px #2563eb55;
+}
+
+.session-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.session-item-header .sensor {
+    color: #a5b4fc;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.session-item-header .session-id {
+    color: #9ca3af;
+}
+
+.session-item-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.session-item-meta .intent {
+    color: #f97316;
+}
+
+.session-item-meta .risk {
+    color: #facc15;
+}
+
+.session-item-summary {
+    font-size: 12px;
+    color: #d1d5db;
+}
+
+.session-detail {
+    font-size: 14px;
+}
+
+.block {
+    margin-bottom: 14px;
+    padding: 10px;
+    background: #020617;
+    border-radius: 8px;
+    border: 1px solid #1f2937;
+}
+
+.block h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+}
+
+.block h4 {
+    margin: 8px 0 4px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #111827;
+    border: 1px solid #4b5563;
+    margin-right: 6px;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list li {
+    margin-bottom: 4px;
+}
+
+.sigma-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sigma-title {
+    font-weight: 500;
+}
+
+.sigma-meta {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-right: 8px;
+}
+
+.sigma-view-btn {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid #4b5563;
+    background: #020617;
+    color: #e5e7eb;
+    cursor: pointer;
+}
+
+.sigma-view-btn:hover {
+    border-color: #2563eb;
+}
+
+pre {
+    font-size: 12px;
+    background: #020617;
+    padding: 8px;
+    border-radius: 6px;
+    overflow-x: auto;
+    border: 1px solid #1f2937;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Modal */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+}
+
+.modal-content {
+    position: relative;
+    background: #020617;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #1f2937;
+    width: 70%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 41;
+}
+
+.modal-content h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #e5e7eb;
+}
+
+@media (max-width: 900px) {
+    .main {
+        flex-direction: column;
+    }
+    .sessions-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #1f2937;
+        max-height: 40vh;
+    }
+}

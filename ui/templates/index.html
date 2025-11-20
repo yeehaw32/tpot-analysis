@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Honeypot Review UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="page">
+    <header class="header">
+        <div class="header-left">
+            <h1>Honeypot Session Review</h1>
+            <p>ETL → AI Layer 1 → RAG-enriched sessions</p>
+        </div>
+        <div class="header-right">
+            <label for="date-input">Date:</label>
+            <input type="date" id="date-input" value="{{ default_date }}">
+            <button id="reload-btn">Load</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="sessions-panel">
+            <h2>Sessions</h2>
+            <div id="sessions-list" class="sessions-list">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <section class="detail-panel">
+            <h2>Session detail</h2>
+            <div id="session-detail" class="session-detail">
+                <p>Select a session to view details.</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Sigma modal -->
+<div id="sigma-modal" class="modal hidden">
+    <div class="modal-backdrop" id="sigma-modal-backdrop"></div>
+    <div class="modal-content">
+        <button class="modal-close" id="sigma-modal-close">×</button>
+        <h3 id="sigma-modal-title">Sigma rule</h3>
+        <pre id="sigma-modal-body"></pre>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
