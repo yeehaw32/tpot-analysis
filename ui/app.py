@@ -10,7 +10,7 @@ import chromadb
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ENRICHED_BASE_DIR = "/data/tpot_sessions/enriched"
-CHROMA_PATH = os.path.join(BASE_DIR, "..", "chroma")
+CHROMA_PATH = "/home/bertil/tpot-analysis/data/chroma"
 
 app = Flask(
     __name__,
@@ -20,7 +20,7 @@ app = Flask(
 
 # Embedded ChromaDB client on Analysis VM
 chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
-sigma_collection = chroma_client.get_or_create_collection("sigma")
+sigma_collection = chroma_client.get_collection("sigma")
 mitre_collection = chroma_client.get_or_create_collection("mitre")
 
 
