@@ -2,7 +2,7 @@ import os
 import json
 import glob
 import datetime
-
+from ai.rag.sigma_query import get_sigma_collection
 from flask import Flask, jsonify, render_template, request, abort
 
 import chromadb
@@ -18,11 +18,10 @@ app = Flask(
     template_folder="templates"
 )
 
-# Embedded ChromaDB client on Analysis VM
-chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
-sigma_collection = chroma_client.get_or_create_collection("sigma")
-mitre_collection = chroma_client.get_or_create_collection("mitre")
-# suricata_collection = chroma_client.get_collection("suricata")
+# # Embedded ChromaDB client on Analysis VM
+# chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+# sigma_collection = chroma_client.get_or_create_collection("sigma")
+# mitre_collection = chroma_client.get_or_create_collection("mitre")
 
 
 def today_str():
@@ -126,28 +125,33 @@ def api_session_detail(session_id):
 
 @app.route("/api/sigma/<sid>")
 def api_sigma_detail(sid):
-    # Try direct get by ID
+    # Use the same settings as enrichment:
+    # chroma_path="./data/chroma/sigma", collection name "sigma_rules"
+    collection = get_sigma_collection(chroma_path="./data/chroma/sigma")
+
     result = None
+
+    # First try direct lookup by ID (we stored id = sid)
     try:
-        get_res = sigma_collection.get(ids=[sid])
-        if get_res and get_res.get("ids"):
+        get_res = collection.get(ids=[sid])
+        if get_res and get_res.get("ids") and get_res["ids"][0]:
             result = {
                 "id": get_res["ids"][0],
                 "document": get_res["documents"][0] if get_res.get("documents") else None,
-                "metadata": get_res["metadatas"][0] if get_res.get("metadatas") else {}
+                "metadata": get_res["metadatas"][0] if get_res.get("metadatas") else {},
             }
     except Exception:
         result = None
 
-    # Fallback: query by metadata sid if needed
+    # Fallback: query by metadata.sid if needed
     if result is None:
         try:
-            q = sigma_collection.query(where={"sid": sid}, n_results=1)
+            q = collection.query(where={"sid": sid}, n_results=1)
             if q and q.get("ids") and q["ids"][0]:
                 result = {
                     "id": q["ids"][0][0],
                     "document": q["documents"][0][0] if q.get("documents") else None,
-                    "metadata": q["metadatas"][0][0] if q.get("metadatas") else {}
+                    "metadata": q["metadatas"][0][0] if q.get("metadatas") else {},
                 }
         except Exception:
             result = None
@@ -156,6 +160,7 @@ def api_sigma_detail(sid):
         abort(404, description="Sigma rule not found in Chroma")
 
     return jsonify(result)
+
 
 
 @app.route("/api/health")
