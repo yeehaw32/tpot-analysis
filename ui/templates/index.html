@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Honeypot Session Review</title>
+    <title>Hhoneypot Session Review</title>
+
+    <!-- Your own CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Highlight.js for YAML syntax highlighting -->
+    <!-- Highlight.js theme -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
+
 <body>
 <div class="page">
     <header class="header">
@@ -59,6 +62,7 @@
     </main>
 </div>
 
+
 <!-- SIGMA MODAL -->
 <div id="sigma-modal" class="modal hidden">
     <div class="modal-backdrop" id="sigma-modal-backdrop"></div>
@@ -73,11 +77,13 @@
     </div>
 </div>
 
-<!-- Highlight.js scripts -->
+
+<!-- Highlight.js core + YAML language -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
 <script>hljs.highlightAll();</script>
 
+<!-- Your JS -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
