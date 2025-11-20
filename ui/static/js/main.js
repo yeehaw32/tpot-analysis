@@ -11,11 +11,24 @@ async function fetchJSON(url) {
     return res.json();
 }
 
+// Always return a list to avoid ".map is not a function"
+function asList(x) {
+    if (Array.isArray(x)) return x;
+    if (x == null) return [];
+    return [x];
+}
+
 function renderSessionsList(data) {
     const container = document.getElementById("sessions-list");
     container.innerHTML = "";
 
-    const sessions = data.sessions || [];
+    const allSessions = data.sessions || [];
+    const filterEl = document.getElementById("sensor-filter");
+    const currentFilter = filterEl ? filterEl.value : "all";
+
+    const sessions = allSessions.filter(
+        (s) => currentFilter === "all" || s.sensor === currentFilter
+    );
 
     if (sessions.length === 0) {
         container.innerHTML = "<p>No sessions for this date.</p>";
@@ -30,7 +43,7 @@ function renderSessionsList(data) {
         const header = document.createElement("div");
         header.className = "session-item-header";
         header.innerHTML = `
-            <span class="sensor">${s.sensor || "?"}</span>
+            <span class="sensor">${(s.sensor || "?").toUpperCase()}</span>
             <span class="session-id">${s.session_id || ""}</span>
         `;
 
@@ -38,7 +51,9 @@ function renderSessionsList(data) {
         meta.className = "session-item-meta";
         meta.innerHTML = `
             <span class="intent">${s.attack_intent || "unknown"}</span>
-            <span class="risk">Risk: ${s.risk_score != null ? s.risk_score : "?"}</span>
+            <span class="risk">Risk: ${
+                s.risk_score != null ? s.risk_score : "?"
+            }</span>
         `;
 
         const summary = document.createElement("div");
@@ -52,9 +67,11 @@ function renderSessionsList(data) {
         item.addEventListener("click", () => {
             const date = getSelectedDate();
             loadSessionDetail(date, s.session_id);
+
             document
                 .querySelectorAll(".session-item.selected")
                 .forEach(el => el.classList.remove("selected"));
+
             item.classList.add("selected");
         });
 
@@ -65,13 +82,21 @@ function renderSessionsList(data) {
 function renderKeyIndicators(key) {
     if (!key) return "<p>No key indicators.</p>";
 
-    const srcPorts = (key.src_ports || []).join(", ");
-    const destPorts = (key.dest_ports || []).join(", ");
-    const protocols = (key.protocols || []).join(", ");
-    const commands = (key.commands || []).map(c => `<li><code>${c}</code></li>`).join("");
-    const urls = (key.urls || []).map(u => `<li><a href="${u}" target="_blank">${u}</a></li>`).join("");
-    const files = (key.files || []).map(f => `<li><code>${f}</code></li>`).join("");
-    const signatures = (key.signatures || []).map(s => `<li>${s}</li>`).join("");
+    const srcPorts = asList(key.src_ports).join(", ");
+    const destPorts = asList(key.dest_ports).join(", ");
+    const protocols = asList(key.protocols).join(", ");
+
+    const commands = asList(key.commands)
+        .map(c => `<li><code>${c}</code></li>`).join("");
+
+    const urls = asList(key.urls)
+        .map(u => `<li><a href="${u}" target="_blank">${u}</a></li>`).join("");
+
+    const files = asList(key.files)
+        .map(f => `<li><code>${f}</code></li>`).join("");
+
+    const signatures = asList(key.signatures)
+        .map(s => `<li>${s}</li>`).join("");
 
     return `
         <div class="block">
@@ -98,16 +123,15 @@ function renderKeyIndicators(key) {
 }
 
 function renderMitreCandidates(list) {
-    if (!list || list.length === 0) {
-        return "<p>No MITRE candidates.</p>";
-    }
+    list = asList(list);
+    if (list.length === 0) return "<p>No MITRE candidates.</p>";
 
     const items = list.map(m => `
         <li>
-            <span class="badge">${m.tid || ""}</span>
-            <span>${m.name || ""}</span>
-            <span class="score">dist: ${m.distance != null ? m.distance.toFixed(3) : "?"}</span>
-            ${m.mitre_url ? `<a href="${m.mitre_url}" target="_blank">open</a>` : ""}
+            <span class="badge">${m.tid}</span>
+            <span>${m.name}</span>
+            <span class="score">dist: ${m.distance?.toFixed(3)}</span>
+            <a href="${m.mitre_url}" target="_blank">open</a>
         </li>
     `).join("");
 
@@ -120,21 +144,20 @@ function renderMitreCandidates(list) {
 }
 
 function renderSigmaCandidates(list) {
-    if (!list || list.length === 0) {
-        return "<p>No Sigma candidates.</p>";
-    }
+    list = asList(list);
+    if (list.length === 0) return "<p>No Sigma candidates.</p>";
 
     const items = list.map(s => `
         <li>
             <div class="sigma-row">
                 <div>
-                    <span class="badge">${s.sid || ""}</span>
-                    <span class="sigma-title">${s.title || ""}</span>
+                    <span class="badge">${s.sid}</span>
+                    <span class="sigma-title">${s.title}</span>
                 </div>
                 <div class="sigma-meta">
-                    <span>${s.logsource_product || ""} ${s.logsource_service || ""}</span>
-                    <span>level: ${s.level || "?"}</span>
-                    <span>dist: ${s.distance != null ? s.distance.toFixed(3) : "?"}</span>
+                    <span>${s.logsource_product} ${s.logsource_service}</span>
+                    <span>level: ${s.level}</span>
+                    <span>dist: ${s.distance?.toFixed(3)}</span>
                 </div>
                 <button class="sigma-view-btn" data-sid="${s.sid}">View Sigma rule</button>
             </div>
@@ -150,16 +173,15 @@ function renderSigmaCandidates(list) {
 }
 
 function renderSuricataAlerts(list) {
-    if (!list || list.length === 0) {
-        return "<p>No Suricata alerts.</p>";
-    }
+    list = asList(list);
+    if (list.length === 0) return "<p>No Suricata alerts.</p>";
 
     const items = list.map(a => `
         <li>
-            <span class="badge">${a.sid || ""}</span>
-            <span>${a.message || ""}</span>
-            <span class="sigma-meta">${a.category || ""}</span>
-            <span class="sigma-meta">prio: ${a.priority != null ? a.priority : "?"}</span>
+            <span class="badge">${a.sid}</span>
+            <span>${a.message}</span>
+            <span class="sigma-meta">${a.category}</span>
+            <span class="sigma-meta">prio: ${a.priority}</span>
         </li>
     `).join("");
 
@@ -174,10 +196,10 @@ function renderSuricataAlerts(list) {
 function renderSessionDetail(data) {
     const container = document.getElementById("session-detail");
 
-    const key = data.key_indicators || {};
-    const mitre = data.mitre_candidates || [];
-    const sigma = data.sigma_candidates || [];
-    const alerts = data.suricata_alerts || [];
+    const key = data.key_indicators;
+    const mitre = asList(data.mitre_candidates);
+    const sigma = asList(data.sigma_candidates);
+    const alerts = asList(data.suricata_alerts);
 
     const ts = data.timestamp_range || {};
     const startTs = ts.start || "";
@@ -186,17 +208,17 @@ function renderSessionDetail(data) {
     container.innerHTML = `
         <div class="block">
             <h3>Overview</h3>
-            <p><strong>Session ID:</strong> ${data.session_id || ""}</p>
-            <p><strong>Sensor:</strong> ${data.sensor || ""}</p>
-            <p><strong>Intent:</strong> ${data.attack_intent || "unknown"}</p>
-            <p><strong>Risk score:</strong> ${data.risk_score != null ? data.risk_score : "?"}</p>
-            <p><strong>Confidence:</strong> ${data.confidence != null ? data.confidence : "?"}</p>
+            <p><strong>Session ID:</strong> ${data.session_id}</p>
+            <p><strong>Sensor:</strong> ${data.sensor}</p>
+            <p><strong>Intent:</strong> ${data.attack_intent}</p>
+            <p><strong>Risk score:</strong> ${data.risk_score}</p>
+            <p><strong>Confidence:</strong> ${data.confidence}</p>
             <p><strong>Time range:</strong> ${startTs} → ${endTs}</p>
         </div>
 
         <div class="block">
             <h3>Summary</h3>
-            <p>${data.summary || ""}</p>
+            <p>${data.summary}</p>
         </div>
 
         ${renderKeyIndicators(key)}
@@ -211,52 +233,40 @@ function renderSessionDetail(data) {
         </div>
     `;
 
+    // Raw JSON toggle
     const rawBtn = document.getElementById("show-raw-json");
     const rawPre = document.getElementById("raw-json");
-    if (rawBtn && rawPre) {
-        rawBtn.addEventListener("click", () => {
-            if (rawPre.classList.contains("hidden")) {
-                rawPre.textContent = JSON.stringify(data, null, 2);
-                rawPre.classList.remove("hidden");
-                rawBtn.textContent = "Hide raw JSON";
-            } else {
-                rawPre.classList.add("hidden");
-                rawBtn.textContent = "Show raw JSON";
-            }
-        });
-    }
 
-    // Hook Sigma buttons
-    container.querySelectorAll(".sigma-view-btn").forEach(btn => {
+    rawBtn.addEventListener("click", () => {
+        if (rawPre.classList.contains("hidden")) {
+            rawPre.textContent = JSON.stringify(data, null, 2);
+            rawPre.classList.remove("hidden");
+            rawBtn.textContent = "Hide raw JSON";
+        } else {
+            rawPre.classList.add("hidden");
+            rawBtn.textContent = "Show raw JSON";
+        }
+    });
+
+    // Sigma modal buttons
+    document.querySelectorAll(".sigma-view-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            const sid = btn.dataset.sid;
-            if (sid) {
-                openSigmaModal(sid);
-            }
+            openSigmaModal(btn.dataset.sid);
         });
     });
 }
 
+// Load sessions for the selected date
 async function loadSessions(date) {
     try {
         const data = await fetchJSON(`/api/sessions?date=${encodeURIComponent(date)}`);
         renderSessionsList(data);
-        // Optionally auto-load first session
+
         if (data.sessions && data.sessions.length > 0) {
             const first = data.sessions[0];
             loadSessionDetail(date, first.session_id);
-            const firstItem = document.querySelector(
-                `.session-item[data-session-id="${first.session_id}"]`
-            );
-            if (firstItem) {
-                firstItem.classList.add("selected");
-            }
-        } else {
-            document.getElementById("session-detail").innerHTML =
-                "<p>No sessions for this date.</p>";
         }
     } catch (err) {
-        console.error(err);
         document.getElementById("sessions-list").innerHTML =
             `<p>Error loading sessions: ${err.message}</p>`;
     }
@@ -269,13 +279,12 @@ async function loadSessionDetail(date, sessionId) {
         );
         renderSessionDetail(data);
     } catch (err) {
-        console.error(err);
         document.getElementById("session-detail").innerHTML =
             `<p>Error loading session detail: ${err.message}</p>`;
     }
 }
 
-// Sigma modal functions
+// Modal setup
 function setupSigmaModal() {
     const modal = document.getElementById("sigma-modal");
     const backdrop = document.getElementById("sigma-modal-backdrop");
@@ -286,10 +295,9 @@ function setupSigmaModal() {
         document.getElementById("sigma-modal-body").textContent = "";
     }
 
-    if (backdrop) backdrop.addEventListener("click", close);
-    if (closeBtn) closeBtn.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+    closeBtn.addEventListener("click", close);
 
-    // Escape key
     document.addEventListener("keydown", (ev) => {
         if (ev.key === "Escape" && !modal.classList.contains("hidden")) {
             close();
@@ -304,52 +312,37 @@ async function openSigmaModal(sid) {
 
     title.textContent = `Sigma rule: ${sid}`;
     body.textContent = "Loading...";
-
     modal.classList.remove("hidden");
 
     try {
         const data = await fetchJSON(`/api/sigma/${encodeURIComponent(sid)}`);
-
         const meta = data.metadata || {};
         const doc = data.document || "";
 
-        const headerLines = [];
-        if (meta.title) headerLines.push(`# ${meta.title}`);
-        if (meta.sid) headerLines.push(`# SID: ${meta.sid}`);
-        if (meta.level) headerLines.push(`# Level: ${meta.level}`);
-        if (meta.logsource_product || meta.logsource_service) {
-            headerLines.push(
-                `# Source: ${meta.logsource_product || ""} ${meta.logsource_service || ""}`.trim()
-            );
-        }
-        if (meta.mitre_techniques) {
-            headerLines.push(`# MITRE: ${meta.mitre_techniques}`);
-        }
+        const header = [];
+        if (meta.title) header.push(`# ${meta.title}`);
+        if (meta.sid) header.push(`# SID: ${meta.sid}`);
+        if (meta.level) header.push(`# Level: ${meta.level}`);
+        if (meta.mitre_techniques) header.push(`# MITRE: ${meta.mitre_techniques}`);
 
-        const text = headerLines.join("\n") + "\n\n" + doc;
-        body.textContent = text.trim();
+        body.textContent = header.join("\n") + "\n\n" + doc;
     } catch (err) {
-        console.error(err);
         body.textContent = `Error loading Sigma rule: ${err.message}`;
     }
 }
 
+// DOM ready
 document.addEventListener("DOMContentLoaded", () => {
-    const dateInput = document.getElementById("date-input");
-    const reloadBtn = document.getElementById("reload-btn");
-
     setupSigmaModal();
 
-    reloadBtn.addEventListener("click", () => {
-        const date = getSelectedDate();
-        loadSessions(date);
+    document.getElementById("reload-btn").addEventListener("click", () => {
+        loadSessions(getSelectedDate());
     });
 
-    if (!dateInput.value) {
-        const today = new Date();
-        const iso = today.toISOString().slice(0, 10);
-        dateInput.value = iso;
-    }
+    // Sensor filter
+    document.getElementById("sensor-filter").addEventListener("change", () => {
+        loadSessions(getSelectedDate());
+    });
 
     loadSessions(getSelectedDate());
 });
