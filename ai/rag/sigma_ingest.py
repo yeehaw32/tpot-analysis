@@ -104,32 +104,29 @@ def build_text(rule):
 def build_metadata(rule):
     """
     Extract and normalize metadata for ChromaDB storage.
+    Includes full YAML under 'yaml_raw'.
     """
-    sid = rule.get("id")
-    title = rule.get("title", "")
-    level = rule.get("level", "")
-
     logsource = rule.get("logsource", {}) or {}
-    product = logsource.get("product", "")
-    service = logsource.get("service", "")
-
     tags = rule.get("tags", []) or []
-    raw_tags_str = ", ".join(tags)
 
     mitre_ids = extract_mitre_tags(tags)
     mitre_str = ", ".join(mitre_ids)
 
     metadata = {
-        "sid": sid,
-        "title": title,
-        "logsource_product": product,
-        "logsource_service": service,
-        "level": level,
+        "sid": rule.get("id"),
+        "title": rule.get("title", ""),
+        "logsource_product": logsource.get("product", ""),
+        "logsource_service": logsource.get("service", ""),
+        "level": rule.get("level", ""),
         "mitre_techniques": mitre_str,
-        "raw_tags": raw_tags_str,
+        "raw_tags": ", ".join(tags),
+
+        # NEW: store full YAML rule
+        "yaml_raw": yaml.dump(rule)
     }
 
     return metadata
+
 
 
 def ingest_sigma(rule_dir, chroma_path="./data/chroma/sigma", batch_size=25):
