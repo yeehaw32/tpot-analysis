@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hhoneypot Session Review</title>
+    <title>Honeypot Session Review</title>
 
-    <!-- Your own CSS -->
+    <!-- Your CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Highlight.js theme -->
+    <!-- Highlight.js CSS (dark theme) -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
-
 <body>
 <div class="page">
     <header class="header">
@@ -29,7 +28,7 @@
 
     <main class="main">
 
-        <!-- LEFT SIDE -->
+        <!-- LEFT -->
         <section class="sessions-panel">
             <div class="sessions-panel-header">
                 <h2>Sessions</h2>
@@ -46,12 +45,10 @@
                 </div>
             </div>
 
-            <div id="sessions-list" class="sessions-list">
-                <!-- Filled by JS -->
-            </div>
+            <div id="sessions-list" class="sessions-list"></div>
         </section>
 
-        <!-- RIGHT SIDE -->
+        <!-- RIGHT -->
         <section class="detail-panel">
             <h2>Session detail</h2>
             <div id="session-detail" class="session-detail">
@@ -62,7 +59,6 @@
     </main>
 </div>
 
-
 <!-- SIGMA MODAL -->
 <div id="sigma-modal" class="modal hidden">
     <div class="modal-backdrop" id="sigma-modal-backdrop"></div>
@@ -72,18 +68,20 @@
 
         <button id="sigma-copy-btn" class="copy-btn">Copy to clipboard</button>
 
-        <!-- Syntax-highlight container -->
+        <!-- Highlight.js block -->
         <pre><code id="sigma-modal-body" class="language-yaml"></code></pre>
     </div>
 </div>
 
-
-<!-- Highlight.js core + YAML language -->
+<!-- Highlight.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+
+<!-- Initialize -->
 <script>hljs.highlightAll();</script>
 
 <!-- Your JS -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
 </html>
