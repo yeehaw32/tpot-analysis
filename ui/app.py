@@ -125,41 +125,45 @@ def api_session_detail(session_id):
 
 @app.route("/api/sigma/<sid>")
 def api_sigma_detail(sid):
-    # Use the same settings as enrichment:
-    # chroma_path="./data/chroma/sigma", collection name "sigma_rules"
-    collection = get_sigma_collection(chroma_path="./data/chroma/sigma")
+    from ai.rag.sigma_query import get_sigma_collection
 
-    result = None
+    collection = get_sigma_collection(
+        chroma_path="/home/bertil/tpot-analysis/data/chroma/sigma"
+    )
 
-    # First try direct lookup by ID (we stored id = sid)
+    res = None
+
+    # First attempt: direct ID fetch
     try:
         get_res = collection.get(ids=[sid])
-        if get_res and get_res.get("ids") and get_res["ids"][0]:
-            result = {
+        if get_res and get_res["ids"] and get_res["ids"][0]:
+            res = {
                 "id": get_res["ids"][0],
-                "document": get_res["documents"][0] if get_res.get("documents") else None,
-                "metadata": get_res["metadatas"][0] if get_res.get("metadatas") else {},
+                "yaml": get_res["metadatas"][0].get("yaml_raw"),
+                "metadata": get_res["metadatas"][0],
             }
     except Exception:
-        result = None
+        pass
 
-    # Fallback: query by metadata.sid if needed
-    if result is None:
+    # If not found, try metadata query
+    if res is None:
         try:
             q = collection.query(where={"sid": sid}, n_results=1)
-            if q and q.get("ids") and q["ids"][0]:
-                result = {
+            if q and q["ids"] and q["ids"][0]:
+                meta = q["metadatas"][0][0]
+                res = {
                     "id": q["ids"][0][0],
-                    "document": q["documents"][0][0] if q.get("documents") else None,
-                    "metadata": q["metadatas"][0][0] if q.get("metadatas") else {},
+                    "yaml": meta.get("yaml_raw"),
+                    "metadata": meta
                 }
         except Exception:
-            result = None
+            pass
 
-    if result is None:
-        abort(404, description="Sigma rule not found in Chroma")
+    if res is None:
+        abort(404, description="Sigma rule not found")
 
-    return jsonify(result)
+    return jsonify(res)
+
 
 
 

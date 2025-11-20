@@ -11,7 +11,6 @@ async function fetchJSON(url) {
     return res.json();
 }
 
-// Always return a list to avoid ".map is not a function"
 function asList(x) {
     if (Array.isArray(x)) return x;
     if (x == null) return [];
@@ -256,7 +255,6 @@ function renderSessionDetail(data) {
     });
 }
 
-// Load sessions for the selected date
 async function loadSessions(date) {
     try {
         const data = await fetchJSON(`/api/sessions?date=${encodeURIComponent(date)}`);
@@ -284,7 +282,6 @@ async function loadSessionDetail(date, sessionId) {
     }
 }
 
-// Modal setup
 function setupSigmaModal() {
     const modal = document.getElementById("sigma-modal");
     const backdrop = document.getElementById("sigma-modal-backdrop");
@@ -316,22 +313,16 @@ async function openSigmaModal(sid) {
 
     try {
         const data = await fetchJSON(`/api/sigma/${encodeURIComponent(sid)}`);
-        const meta = data.metadata || {};
-        const doc = data.document || "";
 
-        const header = [];
-        if (meta.title) header.push(`# ${meta.title}`);
-        if (meta.sid) header.push(`# SID: ${meta.sid}`);
-        if (meta.level) header.push(`# Level: ${meta.level}`);
-        if (meta.mitre_techniques) header.push(`# MITRE: ${meta.mitre_techniques}`);
+        // Correct field: data.yaml now contains full Sigma YAML
+        const yaml = data.yaml || "YAML not available";
 
-        body.textContent = header.join("\n") + "\n\n" + doc;
+        body.textContent = yaml;  // Already full rule
     } catch (err) {
         body.textContent = `Error loading Sigma rule: ${err.message}`;
     }
 }
 
-// DOM ready
 document.addEventListener("DOMContentLoaded", () => {
     setupSigmaModal();
 
@@ -339,7 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSessions(getSelectedDate());
     });
 
-    // Sensor filter
     document.getElementById("sensor-filter").addEventListener("change", () => {
         loadSessions(getSelectedDate());
     });
