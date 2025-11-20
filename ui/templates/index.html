@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Honeypot Session Review</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Highlight.js for YAML syntax highlighting -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
 <body>
 <div class="page">
@@ -61,10 +65,18 @@
     <div class="modal-content">
         <button class="modal-close" id="sigma-modal-close">×</button>
         <h3 id="sigma-modal-title">Sigma rule</h3>
-        <!-- pre+code; id kept as sigma-modal-body so main.js still works -->
-        <pre><code id="sigma-modal-body"></code></pre>
+
+        <button id="sigma-copy-btn" class="copy-btn">Copy to clipboard</button>
+
+        <!-- Syntax-highlight container -->
+        <pre><code id="sigma-modal-body" class="language-yaml"></code></pre>
     </div>
 </div>
+
+<!-- Highlight.js scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script>hljs.highlightAll();</script>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

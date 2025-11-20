@@ -301,6 +301,26 @@ pre {
 .modal-close:hover {
     color: #e5e7eb;
 }
+.copy-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.copy-btn:hover {
+    background: #2980b9;
+}
+
+code.language-yaml {
+    font-family: monospace;
+    font-size: 0.9rem;
+    white-space: pre;
+}
+
 
 /* MOBILE */
 
