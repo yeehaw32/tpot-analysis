@@ -283,22 +283,49 @@ async function openSigmaModal(sid) {
     const modal = document.getElementById("sigma-modal");
     const title = document.getElementById("sigma-modal-title");
     const body = document.getElementById("sigma-modal-body");
+    const copyBtn = document.getElementById("sigma-copy-btn");
 
     title.textContent = `Sigma rule: ${sid}`;
     body.textContent = "Loading...";
     modal.classList.remove("hidden");
 
     try {
-        const data = await fetchJSON(`/api/sigma/${sid}`);
-        body.textContent = data.yaml_raw || "# ERROR: No YAML content available";
+        const data = await fetchJSON(`/api/sigma/${encodeURIComponent(sid)}`);
+        const meta = data.metadata || {};
 
-        // Re-run HLJS AFTER insertion
-        setTimeout(() => hljs.highlightElement(body), 20);
+        // Be robust: support all variants
+        const yaml =
+            data.yaml ||              // if app.py returns {"yaml": "..."}
+            meta.yaml_raw ||          // if yaml stored in metadata
+            data.document ||          // if YAML is the Chroma "document"
+            "No YAML content available";
 
+        body.textContent = yaml;
+
+        // Re-run syntax highlighting after inserting text
+        if (window.hljs) {
+            hljs.highlightElement(body);
+        }
+
+        // Copy button
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(yaml)
+                    .then(() => {
+                        copyBtn.textContent = "Copied!";
+                        setTimeout(() => { copyBtn.textContent = "Copy to clipboard"; }, 1500);
+                    })
+                    .catch(() => {
+                        copyBtn.textContent = "Copy failed";
+                        setTimeout(() => { copyBtn.textContent = "Copy to clipboard"; }, 1500);
+                    });
+            };
+        }
     } catch (err) {
         body.textContent = `Error loading Sigma rule: ${err.message}`;
     }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
     setupSigmaModal();
