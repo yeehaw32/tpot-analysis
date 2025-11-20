@@ -280,37 +280,43 @@ function setupSigmaModal() {
 }
 
 async function openSigmaModal(sid) {
-    const modal = document.getElementById("sigma-modal");
-    const title = document.getElementById("sigma-modal-title");
-    const body = document.getElementById("sigma-modal-body");
+    const modal   = document.getElementById("sigma-modal");
+    const title   = document.getElementById("sigma-modal-title");
+    const body    = document.getElementById("sigma-modal-body");
     const copyBtn = document.getElementById("sigma-copy-btn");
 
     title.textContent = `Sigma rule: ${sid}`;
-    body.textContent = "Loading...";
+    body.textContent  = "Loading...";
     modal.classList.remove("hidden");
 
     try {
         const data = await fetchJSON(`/api/sigma/${encodeURIComponent(sid)}`);
         const meta = data.metadata || {};
 
-        // Be robust: support all variants
+        // Be robust: try all possible fields where YAML might live
         const yaml =
-            data.yaml ||              // if app.py returns {"yaml": "..."}
-            meta.yaml_raw ||          // if yaml stored in metadata
-            data.document ||          // if YAML is the Chroma "document"
+            data.yaml ||          // if backend returns { "yaml": "..." }
+            meta.yaml_raw ||      // if stored in metadata
+            data.document ||      // if YAML is the Chroma document
             "No YAML content available";
 
-        body.textContent = yaml;
+        // Save plain text for copy-to-clipboard
+        const plainYaml = yaml;
 
-        // Re-run syntax highlighting after inserting text
         if (window.hljs) {
-            hljs.highlightElement(body);
+            // Let highlight.js parse and color the YAML
+            const result = hljs.highlight(yaml, { language: "yaml" });
+            body.innerHTML = result.value;
+            body.classList.add("hljs", "language-yaml");
+        } else {
+            // Fallback if highlight.js not loaded
+            body.textContent = yaml;
         }
 
         // Copy button
         if (copyBtn) {
             copyBtn.onclick = () => {
-                navigator.clipboard.writeText(yaml)
+                navigator.clipboard.writeText(plainYaml)
                     .then(() => {
                         copyBtn.textContent = "Copied!";
                         setTimeout(() => { copyBtn.textContent = "Copy to clipboard"; }, 1500);
@@ -325,6 +331,7 @@ async function openSigmaModal(sid) {
         body.textContent = `Error loading Sigma rule: ${err.message}`;
     }
 }
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
