@@ -57,13 +57,7 @@ def build_session_digest(session: Dict[str, Any], max_events: int = 50) -> str:
 
 
 def build_layer1_system_prompt() -> str:
-    """
-    System prompt for AI Layer 1.
-
-    The model must only reason based on the given session digest.
-    No external databases, no MITRE knowledge, no Sigma, no Suricata libraries.
-    """
-
+  
     text = dedent(
         """
         You are an AI assistant performing security analysis on a single honeypot session.
@@ -72,6 +66,7 @@ def build_layer1_system_prompt() -> str:
         - Only use the information present in the provided session.
         - Do NOT use external knowledge, databases, or documentation.
         - Do NOT claim to know exact MITRE techniques, Sigma rules, or Suricata rules.
+        - Do NOT extract or infer observables into key_indicators. Leave key_indicators empty (the pipeline fills it deterministically).
         - Stay strictly within the evidence you see.
         - If something is unclear, mark it as "unknown" rather than guessing wildly.
 
@@ -108,12 +103,11 @@ def build_layer1_system_prompt() -> str:
         - "attack_intent" should be a short label like
           "ssh_bruteforce", "telnet_bruteforce", "web_scanning",
           "directory_bruteforce", "malware_drop_attempt", "exploit_attempt", or "unknown".
-        - "summary" should be 1–4 sentences, plain language.
+        - "summary" should be 1 - 4 sentences, plain language.
         - "confidence" should reflect how clearly the events support the attack intent.
         - "risk_score" is a simple severity estimate based ONLY on this session.
         """
     ).strip()
-
     return text
 
 

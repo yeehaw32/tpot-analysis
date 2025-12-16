@@ -1,3 +1,4 @@
+#enrich.py
 from ai.rag.mitre_query import enrich_session_with_mitre
 from ai.rag.sigma_query import enrich_session_with_sigma
 from ai.rag.suricata_query import enrich_session_with_suricata

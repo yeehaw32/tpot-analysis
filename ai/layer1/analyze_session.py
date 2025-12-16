@@ -200,20 +200,9 @@ def analyze_single_session(model: ChatOpenAI, session: Dict[str, Any]) -> Dict[s
         else:
             merged[key] = value
 
-    # Deterministic key_indicators from session events (override model guesses)
-    static_indicators = extract_key_indicators_from_session(session)
+        # Deterministic key_indicators from session events (authoritative)
+    merged["key_indicators"] = extract_key_indicators_from_session(session)
 
-    if "key_indicators" not in merged or not isinstance(merged["key_indicators"], dict):
-        merged["key_indicators"] = static_indicators
-    else:
-        for k, v in static_indicators.items():
-            # Only overwrite when we have a non-empty deterministic value
-            if k in ["src_ip", "dest_ip"]:
-                if v:  # non-empty string
-                    merged["key_indicators"][k] = v
-            else:
-                if isinstance(v, list) and len(v) > 0:
-                    merged["key_indicators"][k] = v
 
     return merged
 

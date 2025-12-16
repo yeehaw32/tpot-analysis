@@ -26,21 +26,21 @@ def find_latest_file(prefix):
 
 
 # -----------------------------
-# Normalizers
+# Normalizerss
 # -----------------------------
 
 def normalize_cowrie(src):
-    # src is the _source object
     timestamp = src.get("@timestamp") or src.get("timestamp")
     event = {
         "timestamp": timestamp,
         "sensor": "Cowrie",
-        "session_id": src.get("session"),  # key fix for sessionizing
+        "session_id": src.get("session"),
         "src_ip": src.get("src_ip"),
         "src_port": src.get("src_port"),
-        "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int") or src.get("t-pot_ip_ext"),
+        "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int") \
+         or src.get("t-pot_ip_ext"),
         "dest_port": src.get("dest_port"),
-        "protocol": src.get("protocol"),  # ssh/telnet if present
+        "protocol": src.get("protocol"), 
         "eventid": src.get("eventid"),
         "message": src.get("message"),
         "url": None,

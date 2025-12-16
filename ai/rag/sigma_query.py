@@ -1,3 +1,4 @@
+## sigma_query.py
 import os
 from pathlib import Path
 
