@@ -79,7 +79,11 @@ function renderKeyIndicators(key) {
 
     return `
         <div class="block">
-            <h3>Key indicators</h3>
+            <div class="block-header">
+                <h3 style="margin:0;">Key indicators</h3>
+                <span class="chip">AI Layer 1 (deterministic)</span>
+            </div>
+
             <p><strong>Source IP:</strong> ${key.src_ip}</p>
             <p><strong>Destination IP:</strong> ${key.dest_ip}</p>
             <p><strong>Source ports:</strong> ${srcPorts || "-"}</p>
@@ -103,11 +107,15 @@ function renderKeyIndicators(key) {
 
 function renderMitreCandidates(list) {
     list = asList(list);
-    if (list.length === 0) return "<p>No MITRE candidates.</p>";
 
     return `
-        <div class="block">
-            <h3>MITRE candidates</h3>
+        <details class="block" open>
+            <summary class="block-header">
+                <span>MITRE candidates</span>
+                <span class="chip">AI Layer 2 (RAG)</span>
+            </summary>
+
+            ${list.length === 0 ? "<p>No MITRE candidates.</p>" : `
             <ul class="list">
                 ${list.map(m => `
                     <li>
@@ -117,18 +125,22 @@ function renderMitreCandidates(list) {
                         <a href="${m.mitre_url}" target="_blank">open</a>
                     </li>
                 `).join("")}
-            </ul>
-        </div>
+            </ul>`}
+        </details>
     `;
 }
 
 function renderSigmaCandidates(list) {
     list = asList(list);
-    if (list.length === 0) return "<p>No Sigma candidates.</p>";
 
     return `
-        <div class="block">
-            <h3>Sigma candidates</h3>
+        <details class="block" open>
+            <summary class="block-header">
+                <span>Sigma candidates</span>
+                <span class="chip">AI Layer 2 (RAG)</span>
+            </summary>
+
+            ${list.length === 0 ? "<p>No Sigma candidates.</p>" : `
             <ul class="list">
                 ${list.map(s => `
                     <li>
@@ -148,18 +160,22 @@ function renderSigmaCandidates(list) {
                         </div>
                     </li>
                 `).join("")}
-            </ul>
-        </div>
+            </ul>`}
+        </details>
     `;
 }
 
 function renderSuricataAlerts(list) {
     list = asList(list);
-    if (list.length === 0) return "<p>No Suricata alerts.</p>";
 
     return `
-        <div class="block">
-            <h3>Suricata alerts</h3>
+        <details class="block" open>
+            <summary class="block-header">
+                <span>Suricata alerts</span>
+                <span class="chip">AI Layer 2 (lookup)</span>
+            </summary>
+
+            ${list.length === 0 ? "<p>No Suricata alerts.</p>" : `
             <ul class="list">
                 ${list.map(a => `
                     <li>
@@ -169,8 +185,8 @@ function renderSuricataAlerts(list) {
                         <span>prio: ${a.priority}</span>
                     </li>
                 `).join("")}
-            </ul>
-        </div>
+            </ul>`}
+        </details>
     `;
 }
 
@@ -188,7 +204,10 @@ function renderSessionDetail(data) {
 
     container.innerHTML = `
         <div class="block">
-            <h3>Overview</h3>
+            <div class="block-header">
+                <h3 style="margin:0;">Overview</h3>
+                <span class="chip">AI Layer 1</span>
+            </div>
             <p><strong>Session ID:</strong> ${data.session_id}</p>
             <p><strong>Sensor:</strong> ${data.sensor}</p>
             <p><strong>Intent:</strong> ${data.attack_intent}</p>
@@ -198,7 +217,10 @@ function renderSessionDetail(data) {
         </div>
 
         <div class="block">
-            <h3>Summary</h3>
+            <div class="block-header">
+                <h3 style="margin:0;">Summary</h3>
+                <span class="chip">AI Layer 1</span>
+            </div>
             <p>${data.summary}</p>
         </div>
 
@@ -207,24 +229,17 @@ function renderSessionDetail(data) {
         ${renderSigmaCandidates(sigma)}
         ${renderSuricataAlerts(alerts)}
 
-        <div class="block">
-            <h3>Raw JSON</h3>
-            <button id="show-raw-json">Show raw JSON</button>
-            <pre id="raw-json" class="hidden"></pre>
-        </div>
+        <details class="block">
+            <summary class="block-header">
+                <span>Raw JSON</span>
+                <span class="chip">Audit</span>
+            </summary>
+            <pre id="raw-json"></pre>
+        </details>
     `;
 
-    document.getElementById("show-raw-json").addEventListener("click", () => {
-        const pre = document.getElementById("raw-json");
-        if (pre.classList.contains("hidden")) {
-            pre.textContent = JSON.stringify(data, null, 2);
-            pre.classList.remove("hidden");
-            event.target.textContent = "Hide raw JSON";
-        } else {
-            pre.classList.add("hidden");
-            event.target.textContent = "Show raw JSON";
-        }
-    });
+    const rawPre = document.getElementById("raw-json");
+    if (rawPre) rawPre.textContent = JSON.stringify(data, null, 2);
 
     document.querySelectorAll(".sigma-view-btn").forEach(btn => {
         btn.addEventListener("click", () => openSigmaModal(btn.dataset.sid));
@@ -307,7 +322,6 @@ async function openSigmaModal(sid) {
             body.innerHTML = result.value;
             body.classList.add("hljs", "language-yaml");
 
-            // ⭐ THE IMPORTANT LINE ⭐
             hljs.highlightElement(body);
         } else {
             body.textContent = yaml;
@@ -317,11 +331,11 @@ async function openSigmaModal(sid) {
             navigator.clipboard.writeText(plainYaml)
                 .then(() => {
                     copyBtn.textContent = "Copied!";
-                    setTimeout(() => copyBtn.textContent="Copy to clipboard", 1200);
+                    setTimeout(() => copyBtn.textContent = "Copy to clipboard", 1200);
                 })
                 .catch(() => {
                     copyBtn.textContent = "Copy failed";
-                    setTimeout(() => copyBtn.textContent="Copy to clipboard", 1200);
+                    setTimeout(() => copyBtn.textContent = "Copy to clipboard", 1200);
                 });
         };
 
@@ -330,11 +344,24 @@ async function openSigmaModal(sid) {
     }
 }
 
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
     setupSigmaModal();
+
+    // Theme toggle (requires <button id="theme-toggle"> in index.html)
+    const themeBtn = document.getElementById("theme-toggle");
+    if (themeBtn) {
+        const saved = localStorage.getItem("ui_theme");
+        if (saved) {
+            document.body.classList.toggle("theme-light", saved === "light");
+            themeBtn.textContent = (saved === "light") ? "Dark mode" : "Light mode";
+        }
+
+        themeBtn.addEventListener("click", () => {
+            const isLight = document.body.classList.toggle("theme-light");
+            localStorage.setItem("ui_theme", isLight ? "light" : "dark");
+            themeBtn.textContent = isLight ? "Dark mode" : "Light mode";
+        });
+    }
 
     document.getElementById("reload-btn").addEventListener("click", () => {
         loadSessions(getSelectedDate());
