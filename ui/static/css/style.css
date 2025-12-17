@@ -20,53 +20,52 @@
     --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
 }
 
-/* Light-ish theme (dim light / low-glare) */
+/* Light-ish theme (dim gray / low-glare, no blue cast) */
 body.theme-light {
-    /* Page background: mid-light slate (NOT white) */
-    --bg: #cfd8e3;
+    /* Background: warm neutral gray */
+    --bg: #d6d3d1;        /* stone-ish */
 
-    /* Surfaces/cards: light slate, still clearly lighter than dark mode */
-    --panel: #dde6f1;
+    /* Cards: slightly lighter neutral */
+    --panel: #e4e1de;
 
-    /* Secondary surface (left pane background) */
-    --panel-2: #c5d0dd;
+    /* Secondary surface (left pane): slightly darker than cards */
+    --panel-2: #cfcac5;
 
-    /* Text colors */
-    --text: #0b1220;
-    --muted: #334155;
+    /* Text */
+    --text: #111827;
+    --muted: #374151;
 
-    /* Borders + accent */
-    --border: #aebac8;
+    /* Borders */
+    --border: #b8b2ab;
+
+    /* Accent: keep blue for links/buttons, but not too neon */
     --accent: #1d4ed8;
 
-    /* Chips/badges */
-    --chip-bg: rgba(255, 255, 255, 0.35);
-    --badge-bg: rgba(255, 255, 255, 0.35);
-    --badge-border: #9aa7b7;
+    /* Chips/badges: subtle, not white */
+    --chip-bg: rgba(255, 255, 255, 0.22);
+    --badge-bg: rgba(255, 255, 255, 0.22);
+    --badge-border: #a39d96;
 
-    /* Modal backdrop */
     --modal-backdrop: rgba(15, 23, 42, 0.22);
 
-    /* Shadow: enough separation without looking “glowy” */
     --shadow:
-        0 1px 0 rgba(15, 23, 42, 0.08),
-        0 10px 22px rgba(15, 23, 42, 0.12);
+        0 1px 0 rgba(17, 24, 39, 0.08),
+        0 10px 22px rgba(17, 24, 39, 0.14);
 }
 
-/* Make inputs look like part of the surface (not bright white) */
+/* Inputs: match the neutral surface */
 body.theme-light .header-right input[type="date"],
 body.theme-light .sensor-filter select {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.22);
     border-color: var(--border);
 }
 
-/* Reduce “flashlight” effect inside inner cards in light mode */
+/* Inner cards + code blocks: slightly inset */
 body.theme-light .mitre-card,
 body.theme-light .sigma-card,
 body.theme-light pre {
-    background: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.18);
 }
-
 
 
 body {
