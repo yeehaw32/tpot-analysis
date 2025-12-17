@@ -17,13 +17,15 @@ function asList(x) {
 
 function fmtTime(ts) {
     if (!ts) return "-";
-    // Accept ISO-ish strings and make them shorter for the list view
-    // Example: 2025-11-11T13:07:35.058Z -> 13:07:35
     if (typeof ts === "string" && ts.includes("T")) {
         const timePart = ts.split("T")[1] || "";
         return timePart.replace("Z", "").split(".")[0] || ts;
     }
     return ts;
+}
+
+function distanceHelpText() {
+    return `Distance is a similarity score from the RAG matching. Lower = closer match, higher = weaker match.`;
 }
 
 function renderSessionsList(data) {
@@ -45,7 +47,7 @@ function renderSessionsList(data) {
         item.className = "session-item";
         item.dataset.sessionId = s.session_id;
 
-        // Put the old summary into tooltip (so left pane stays compact)
+        // Summary moved to tooltip to keep list compact
         if (s.short_summary) item.title = s.short_summary;
 
         const srcIp = s.src_ip || "-";
@@ -131,7 +133,9 @@ function renderKeyIndicators(key) {
 }
 
 function renderMitreCandidates(list) {
-    list = asList(list);
+    const full = asList(list);
+    const total = full.length;
+    const top = full.slice(0, 3);
 
     return `
         <details class="block" open>
@@ -140,19 +144,23 @@ function renderMitreCandidates(list) {
                 <span class="chip">AI Layer 2 (RAG)</span>
             </summary>
 
-            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No MITRE candidates.</p>" : `
+            <p class="section-help">${distanceHelpText()}</p>
+            ${total > 3 ? `<p class="section-subtle">Showing top 3 of ${total} results.</p>` : ""}
+
+            ${top.length === 0 ? "<p style='margin:0; color:var(--muted);'>No MITRE candidates.</p>" : `
             <ul class="list">
-                ${list.map(m => `
-                    <li class="candidate-row">
-                        <div class="candidate-main">
-                            <div class="candidate-title">
-                                <span class="badge">${m.tid}</span>${m.name}
+                ${top.map(m => `
+                    <li class="mitre-card">
+                        <div class="mitre-left">
+                            <div class="mitre-title">
+                                <span class="badge">${m.tid}</span>
+                                <span>${m.name}</span>
                             </div>
-                            <div class="candidate-meta">
-                                <span>dist: ${m.distance?.toFixed(3)}</span>
+                            <div class="mitre-meta">
+                                <span class="pill">dist ${m.distance?.toFixed(3)}</span>
                             </div>
                         </div>
-                        <div class="candidate-right">
+                        <div class="mitre-right">
                             <a href="${m.mitre_url}" target="_blank" rel="noreferrer">open</a>
                         </div>
                     </li>
@@ -163,7 +171,9 @@ function renderMitreCandidates(list) {
 }
 
 function renderSigmaCandidates(list) {
-    list = asList(list);
+    const full = asList(list);
+    const total = full.length;
+    const top = full.slice(0, 3);
 
     return `
         <details class="block" open>
@@ -172,54 +182,24 @@ function renderSigmaCandidates(list) {
                 <span class="chip">AI Layer 2 (RAG)</span>
             </summary>
 
-            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No Sigma candidates.</p>" : `
+            <p class="section-help">${distanceHelpText()}</p>
+            ${total > 3 ? `<p class="section-subtle">Showing top 3 of ${total} results.</p>` : ""}
+
+            ${top.length === 0 ? "<p style='margin:0; color:var(--muted);'>No Sigma candidates.</p>" : `
             <ul class="list">
-                ${list.map(s => `
-                    <li>
-                        <div class="sigma-row">
-                            <div>
-                                <span class="badge">${s.sid}</span>
-                                <span class="sigma-title">${s.title}</span>
-                            </div>
-                            <div class="sigma-meta">
-                                <span>${s.logsource_product} ${s.logsource_service}</span>
-                                <span>level: ${s.level}</span>
-                                <span>dist: ${s.distance?.toFixed(3)}</span>
-                            </div>
-                            <button class="sigma-view-btn" data-sid="${s.sid}">
-                                View Sigma rule
-                            </button>
+                ${top.map(s => `
+                    <li class="sigma-card">
+                        <div class="sigma-title">${s.title}</div>
+
+                        <div class="sigma-meta">
+                            <span>${(s.logsource_product || "").toLowerCase()}${s.logsource_service ? ` · ${s.logsource_service}` : ""}</span>
+                            <span>level: ${s.level || "-"}</span>
+                            <span class="pill">dist ${s.distance?.toFixed(3)}</span>
                         </div>
-                    </li>
-                `).join("")}
-            </ul>`}
-        </details>
-    `;
-}
 
-function renderSuricataAlerts(list) {
-    list = asList(list);
-
-    return `
-        <details class="block" open>
-            <summary class="block-header">
-                <h3 style="margin:0;">Suricata alerts</h3>
-                <span class="chip">AI Layer 2 (lookup)</span>
-            </summary>
-
-            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No Suricata alerts.</p>" : `
-            <ul class="list">
-                ${list.map(a => `
-                    <li class="candidate-row">
-                        <div class="candidate-main">
-                            <div class="candidate-title">
-                                <span class="badge">${a.sid}</span>${a.message}
-                            </div>
-                            <div class="candidate-meta">
-                                <span>${a.category || "-"}</span>
-                                <span>prio: ${a.priority ?? "-"}</span>
-                            </div>
-                        </div>
+                        <button class="sigma-view-btn" data-sid="${s.sid}" data-title="${(s.title || "").replace(/"/g, "&quot;")}">
+                            View Sigma rule
+                        </button>
                     </li>
                 `).join("")}
             </ul>`}
@@ -233,7 +213,6 @@ function renderSessionDetail(data) {
     const key = data.key_indicators;
     const mitre = asList(data.mitre_candidates);
     const sigma = asList(data.sigma_candidates);
-    const alerts = asList(data.suricata_alerts);
 
     const ts = data.timestamp_range || {};
     const start = ts.start || "";
@@ -268,15 +247,7 @@ function renderSessionDetail(data) {
                 </div>
 
                 ${renderKeyIndicators(key)}
-            </div>
 
-            <div class="detail-col">
-                ${renderMitreCandidates(mitre)}
-                ${renderSigmaCandidates(sigma)}
-                ${renderSuricataAlerts(alerts)}
-            </div>
-
-            <div class="detail-span">
                 <details class="block">
                     <summary class="block-header">
                         <h3 style="margin:0;">Raw JSON</h3>
@@ -286,6 +257,11 @@ function renderSessionDetail(data) {
                 </details>
             </div>
 
+            <div class="detail-col">
+                ${renderMitreCandidates(mitre)}
+                ${renderSigmaCandidates(sigma)}
+            </div>
+
         </div>
     `;
 
@@ -293,7 +269,7 @@ function renderSessionDetail(data) {
     if (rawPre) rawPre.textContent = JSON.stringify(data, null, 2);
 
     document.querySelectorAll(".sigma-view-btn").forEach(btn => {
-        btn.addEventListener("click", () => openSigmaModal(btn.dataset.sid));
+        btn.addEventListener("click", () => openSigmaModal(btn.dataset.sid, btn.dataset.title));
     });
 }
 
@@ -304,8 +280,6 @@ function selectSessionInList(sessionId) {
     document.querySelectorAll(".session-item.selected")
         .forEach(x => x.classList.remove("selected"));
     el.classList.add("selected");
-
-    // Ensure selected is visible in scroll
     el.scrollIntoView({ block: "nearest" });
 }
 
@@ -363,13 +337,13 @@ function setupSigmaModal() {
     });
 }
 
-async function openSigmaModal(sid) {
+async function openSigmaModal(sid, titleText) {
     const modal   = document.getElementById("sigma-modal");
     const title   = document.getElementById("sigma-modal-title");
     const body    = document.getElementById("sigma-modal-body");
     const copyBtn = document.getElementById("sigma-copy-btn");
 
-    title.textContent = `Sigma rule: ${sid}`;
+    title.textContent = titleText ? `Sigma rule: ${titleText}` : `Sigma rule`;
     body.textContent  = "Loading...";
     modal.classList.remove("hidden");
 

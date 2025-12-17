@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <title>Honeypot Session Review</title>
 
-    <!-- Your CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Highlight.js CSS (dark theme) -->
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css">
 </head>
@@ -29,8 +27,6 @@
     </header>
 
     <main class="main">
-
-        <!-- LEFT -->
         <section class="sessions-panel">
             <div class="sessions-panel-header">
                 <h2>Sessions</h2>
@@ -50,7 +46,6 @@
             <div id="sessions-list" class="sessions-list"></div>
         </section>
 
-        <!-- RIGHT -->
         <section class="detail-panel">
             <div class="detail-panel-header">
                 <h2>Session detail</h2>
@@ -63,11 +58,9 @@
                 </div>
             </div>
         </section>
-
     </main>
 </div>
 
-<!-- SIGMA MODAL -->
 <div id="sigma-modal" class="modal hidden">
     <div class="modal-backdrop" id="sigma-modal-backdrop"></div>
     <div class="modal-content">
@@ -76,19 +69,14 @@
 
         <button id="sigma-copy-btn" class="copy-btn">Copy to clipboard</button>
 
-        <!-- Highlight.js block -->
         <pre><code id="sigma-modal-body" class="language-yaml"></code></pre>
     </div>
 </div>
 
-<!-- Highlight.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
-
-<!-- Initialize -->
 <script>hljs.highlightAll();</script>
 
-<!-- Your JS -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 </body>
