@@ -10,8 +10,8 @@
     <!-- Highlight.js CSS (dark theme) -->
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css">
-
 </head>
+
 <body>
 <div class="page">
     <header class="header">
@@ -52,9 +52,15 @@
 
         <!-- RIGHT -->
         <section class="detail-panel">
-            <h2>Session detail</h2>
-            <div id="session-detail" class="session-detail">
-                <p>Select a session to view details.</p>
+            <div class="detail-panel-header">
+                <h2>Session detail</h2>
+                <p class="detail-hint">Tip: hover sessions to preview the summary</p>
+            </div>
+
+            <div class="detail-scroll">
+                <div id="session-detail" class="session-detail">
+                    <p style="color: var(--muted); margin: 0;">Select a session to view details.</p>
+                </div>
             </div>
         </section>
 

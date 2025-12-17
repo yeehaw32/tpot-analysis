@@ -15,6 +15,17 @@ function asList(x) {
     return [x];
 }
 
+function fmtTime(ts) {
+    if (!ts) return "-";
+    // Accept ISO-ish strings and make them shorter for the list view
+    // Example: 2025-11-11T13:07:35.058Z -> 13:07:35
+    if (typeof ts === "string" && ts.includes("T")) {
+        const timePart = ts.split("T")[1] || "";
+        return timePart.replace("Z", "").split(".")[0] || ts;
+    }
+    return ts;
+}
+
 function renderSessionsList(data) {
     const container = document.getElementById("sessions-list");
     container.innerHTML = "";
@@ -25,7 +36,7 @@ function renderSessionsList(data) {
     const sessions = all.filter(s => f === "all" || s.sensor === f);
 
     if (sessions.length === 0) {
-        container.innerHTML = "<p>No sessions for this date.</p>";
+        container.innerHTML = "<p style='color:var(--muted); margin:8px 4px;'>No sessions for this date.</p>";
         return;
     }
 
@@ -34,16 +45,28 @@ function renderSessionsList(data) {
         item.className = "session-item";
         item.dataset.sessionId = s.session_id;
 
+        // Put the old summary into tooltip (so left pane stays compact)
+        if (s.short_summary) item.title = s.short_summary;
+
+        const srcIp = s.src_ip || "-";
+        const dstIp = s.dest_ip || "-";
+        const start = fmtTime(s.start_time);
+
         item.innerHTML = `
-            <div class="session-item-header">
-                <span class="sensor">${(s.sensor || "?").toUpperCase()}</span>
-                <span class="session-id">${s.session_id}</span>
+            <div class="session-item-top">
+                <span class="sensor-chip">${(s.sensor || "?").toUpperCase()}</span>
+                <span class="risk-badge">Risk ${s.risk_score ?? "?"}</span>
             </div>
-            <div class="session-item-meta">
-                <span class="intent">${s.attack_intent || "unknown"}</span>
-                <span class="risk">Risk: ${s.risk_score ?? "?"}</span>
+
+            <div class="session-item-main">
+                <div class="session-intent">${s.attack_intent || "unknown"}</div>
+                <div class="session-id">${s.session_id}</div>
             </div>
-            <div class="session-item-summary">${s.short_summary || ""}</div>
+
+            <div class="session-item-sub">
+                <span class="session-ips">${srcIp} → ${dstIp}</span>
+                <span class="session-time">${start}</span>
+            </div>
         `;
 
         item.addEventListener("click", () => {
@@ -59,7 +82,7 @@ function renderSessionsList(data) {
 }
 
 function renderKeyIndicators(key) {
-    if (!key) return "<p>No key indicators.</p>";
+    if (!key) return "<div class='block'><p style='margin:0; color:var(--muted);'>No key indicators.</p></div>";
 
     const srcPorts = asList(key.src_ports).join(", ");
     const destPorts = asList(key.dest_ports).join(", ");
@@ -69,7 +92,7 @@ function renderKeyIndicators(key) {
         .map(c => `<li><code>${c}</code></li>`).join("");
 
     const urls = asList(key.urls)
-        .map(u => `<li><a href="${u}" target="_blank">${u}</a></li>`).join("");
+        .map(u => `<li><a href="${u}" target="_blank" rel="noreferrer">${u}</a></li>`).join("");
 
     const files = asList(key.files)
         .map(f => `<li><code>${f}</code></li>`).join("");
@@ -80,27 +103,29 @@ function renderKeyIndicators(key) {
     return `
         <div class="block">
             <div class="block-header">
-                <h3 style="margin:0;">Key indicators</h3>
+                <h3>Key indicators</h3>
                 <span class="chip">AI Layer 1 (deterministic)</span>
             </div>
 
-            <p><strong>Source IP:</strong> ${key.src_ip}</p>
-            <p><strong>Destination IP:</strong> ${key.dest_ip}</p>
-            <p><strong>Source ports:</strong> ${srcPorts || "-"}</p>
-            <p><strong>Destination ports:</strong> ${destPorts || "-"}</p>
-            <p><strong>Protocols:</strong> ${protocols || "-"}</p>
+            <dl class="kv">
+                <dt>Source IP</dt><dd>${key.src_ip || "-"}</dd>
+                <dt>Destination IP</dt><dd>${key.dest_ip || "-"}</dd>
+                <dt>Source ports</dt><dd>${srcPorts || "-"}</dd>
+                <dt>Destination ports</dt><dd>${destPorts || "-"}</dd>
+                <dt>Protocols</dt><dd>${protocols || "-"}</dd>
+            </dl>
 
             <h4>Commands</h4>
-            <ul>${commands || "<li>None</li>"}</ul>
+            <ul class="list" style="gap:4px;">${commands || "<li style='color:var(--muted);'>None</li>"}</ul>
 
             <h4>URLs</h4>
-            <ul>${urls || "<li>None</li>"}</ul>
+            <ul class="list" style="gap:4px;">${urls || "<li style='color:var(--muted);'>None</li>"}</ul>
 
             <h4>Files</h4>
-            <ul>${files || "<li>None</li>"}</ul>
+            <ul class="list" style="gap:4px;">${files || "<li style='color:var(--muted);'>None</li>"}</ul>
 
             <h4>Signatures</h4>
-            <ul>${sigs || "<li>None</li>"}</ul>
+            <ul class="list" style="gap:4px;">${sigs || "<li style='color:var(--muted);'>None</li>"}</ul>
         </div>
     `;
 }
@@ -111,18 +136,25 @@ function renderMitreCandidates(list) {
     return `
         <details class="block" open>
             <summary class="block-header">
-                <span>MITRE candidates</span>
+                <h3 style="margin:0;">MITRE candidates</h3>
                 <span class="chip">AI Layer 2 (RAG)</span>
             </summary>
 
-            ${list.length === 0 ? "<p>No MITRE candidates.</p>" : `
+            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No MITRE candidates.</p>" : `
             <ul class="list">
                 ${list.map(m => `
-                    <li>
-                        <span class="badge">${m.tid}</span>
-                        <span>${m.name}</span>
-                        <span class="score">dist: ${m.distance?.toFixed(3)}</span>
-                        <a href="${m.mitre_url}" target="_blank">open</a>
+                    <li class="candidate-row">
+                        <div class="candidate-main">
+                            <div class="candidate-title">
+                                <span class="badge">${m.tid}</span>${m.name}
+                            </div>
+                            <div class="candidate-meta">
+                                <span>dist: ${m.distance?.toFixed(3)}</span>
+                            </div>
+                        </div>
+                        <div class="candidate-right">
+                            <a href="${m.mitre_url}" target="_blank" rel="noreferrer">open</a>
+                        </div>
                     </li>
                 `).join("")}
             </ul>`}
@@ -136,11 +168,11 @@ function renderSigmaCandidates(list) {
     return `
         <details class="block" open>
             <summary class="block-header">
-                <span>Sigma candidates</span>
+                <h3 style="margin:0;">Sigma candidates</h3>
                 <span class="chip">AI Layer 2 (RAG)</span>
             </summary>
 
-            ${list.length === 0 ? "<p>No Sigma candidates.</p>" : `
+            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No Sigma candidates.</p>" : `
             <ul class="list">
                 ${list.map(s => `
                     <li>
@@ -171,18 +203,23 @@ function renderSuricataAlerts(list) {
     return `
         <details class="block" open>
             <summary class="block-header">
-                <span>Suricata alerts</span>
+                <h3 style="margin:0;">Suricata alerts</h3>
                 <span class="chip">AI Layer 2 (lookup)</span>
             </summary>
 
-            ${list.length === 0 ? "<p>No Suricata alerts.</p>" : `
+            ${list.length === 0 ? "<p style='margin:0; color:var(--muted);'>No Suricata alerts.</p>" : `
             <ul class="list">
                 ${list.map(a => `
-                    <li>
-                        <span class="badge">${a.sid}</span>
-                        <span>${a.message}</span>
-                        <span>${a.category}</span>
-                        <span>prio: ${a.priority}</span>
+                    <li class="candidate-row">
+                        <div class="candidate-main">
+                            <div class="candidate-title">
+                                <span class="badge">${a.sid}</span>${a.message}
+                            </div>
+                            <div class="candidate-meta">
+                                <span>${a.category || "-"}</span>
+                                <span>prio: ${a.priority ?? "-"}</span>
+                            </div>
+                        </div>
                     </li>
                 `).join("")}
             </ul>`}
@@ -203,39 +240,53 @@ function renderSessionDetail(data) {
     const end = ts.end || "";
 
     container.innerHTML = `
-        <div class="block">
-            <div class="block-header">
-                <h3 style="margin:0;">Overview</h3>
-                <span class="chip">AI Layer 1</span>
+        <div class="detail-grid">
+
+            <div class="detail-col">
+                <div class="block">
+                    <div class="block-header">
+                        <h3>Overview</h3>
+                        <span class="chip">AI Layer 1</span>
+                    </div>
+
+                    <dl class="kv">
+                        <dt>Session ID</dt><dd>${data.session_id || "-"}</dd>
+                        <dt>Sensor</dt><dd class="normal">${data.sensor || "-"}</dd>
+                        <dt>Intent</dt><dd class="normal">${data.attack_intent || "-"}</dd>
+                        <dt>Risk score</dt><dd>${data.risk_score ?? "-"}</dd>
+                        <dt>Confidence</dt><dd>${data.confidence ?? "-"}</dd>
+                        <dt>Time range</dt><dd class="normal">${start} → ${end}</dd>
+                    </dl>
+                </div>
+
+                <div class="block">
+                    <div class="block-header">
+                        <h3>Summary</h3>
+                        <span class="chip">AI Layer 1</span>
+                    </div>
+                    <p style="margin:0; line-height:1.45;">${data.summary || "-"}</p>
+                </div>
+
+                ${renderKeyIndicators(key)}
             </div>
-            <p><strong>Session ID:</strong> ${data.session_id}</p>
-            <p><strong>Sensor:</strong> ${data.sensor}</p>
-            <p><strong>Intent:</strong> ${data.attack_intent}</p>
-            <p><strong>Risk score:</strong> ${data.risk_score}</p>
-            <p><strong>Confidence:</strong> ${data.confidence}</p>
-            <p><strong>Time range:</strong> ${start} → ${end}</p>
-        </div>
 
-        <div class="block">
-            <div class="block-header">
-                <h3 style="margin:0;">Summary</h3>
-                <span class="chip">AI Layer 1</span>
+            <div class="detail-col">
+                ${renderMitreCandidates(mitre)}
+                ${renderSigmaCandidates(sigma)}
+                ${renderSuricataAlerts(alerts)}
             </div>
-            <p>${data.summary}</p>
+
+            <div class="detail-span">
+                <details class="block">
+                    <summary class="block-header">
+                        <h3 style="margin:0;">Raw JSON</h3>
+                        <span class="chip">Audit</span>
+                    </summary>
+                    <pre id="raw-json"></pre>
+                </details>
+            </div>
+
         </div>
-
-        ${renderKeyIndicators(key)}
-        ${renderMitreCandidates(mitre)}
-        ${renderSigmaCandidates(sigma)}
-        ${renderSuricataAlerts(alerts)}
-
-        <details class="block">
-            <summary class="block-header">
-                <span>Raw JSON</span>
-                <span class="chip">Audit</span>
-            </summary>
-            <pre id="raw-json"></pre>
-        </details>
     `;
 
     const rawPre = document.getElementById("raw-json");
@@ -246,28 +297,44 @@ function renderSessionDetail(data) {
     });
 }
 
+function selectSessionInList(sessionId) {
+    const el = document.querySelector(`.session-item[data-session-id="${sessionId}"]`);
+    if (!el) return;
+
+    document.querySelectorAll(".session-item.selected")
+        .forEach(x => x.classList.remove("selected"));
+    el.classList.add("selected");
+
+    // Ensure selected is visible in scroll
+    el.scrollIntoView({ block: "nearest" });
+}
+
 async function loadSessions(date) {
     try {
         const data = await fetchJSON(`/api/sessions?date=${date}`);
         renderSessionsList(data);
 
-        if (data.sessions?.length)
-            loadSessionDetail(date, data.sessions[0].session_id);
+        if (data.sessions?.length) {
+            const firstId = data.sessions[0].session_id;
+            await loadSessionDetail(date, firstId);
+            selectSessionInList(firstId);
+        } else {
+            document.getElementById("session-detail").innerHTML =
+                `<p style="color:var(--muted); margin:0;">Select a session to view details.</p>`;
+        }
     } catch (err) {
         document.getElementById("sessions-list").innerHTML =
-            `<p>Error loading sessions: ${err.message}</p>`;
+            `<p style="color:var(--muted); margin:8px 4px;">Error loading sessions: ${err.message}</p>`;
     }
 }
 
 async function loadSessionDetail(date, sessionId) {
     try {
-        const data = await fetchJSON(
-            `/api/session/${sessionId}?date=${date}`
-        );
+        const data = await fetchJSON(`/api/session/${sessionId}?date=${date}`);
         renderSessionDetail(data);
     } catch (err) {
         document.getElementById("session-detail").innerHTML =
-            `<p>Error loading session detail: ${err.message}</p>`;
+            `<p style="color:var(--muted); margin:0;">Error loading session detail: ${err.message}</p>`;
     }
 }
 
@@ -278,7 +345,9 @@ function setupSigmaModal() {
 
     function hide() {
         modal.classList.add("hidden");
-        document.getElementById("sigma-modal-body").textContent = "";
+        const body = document.getElementById("sigma-modal-body");
+        body.textContent = "";
+        body.classList.remove("hljs", "language-yaml");
     }
 
     close.addEventListener("click", hide);
@@ -316,12 +385,10 @@ async function openSigmaModal(sid) {
 
         const plainYaml = yaml;
 
-        // Highlight.js version
         if (window.hljs) {
             const result = hljs.highlight(yaml, { language: "yaml" });
             body.innerHTML = result.value;
             body.classList.add("hljs", "language-yaml");
-
             hljs.highlightElement(body);
         } else {
             body.textContent = yaml;
@@ -347,7 +414,6 @@ async function openSigmaModal(sid) {
 document.addEventListener("DOMContentLoaded", () => {
     setupSigmaModal();
 
-    // Theme toggle (requires <button id="theme-toggle"> in index.html)
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) {
         const saved = localStorage.getItem("ui_theme");
