@@ -20,52 +20,46 @@
     --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
 }
 
-/* Light-ish theme (dim gray / low-glare, no blue cast) */
+/* Light theme: clean + minimal (neutral, low glare) */
 body.theme-light {
-    /* Background: warm neutral gray */
-    --bg: #d6d3d1;        /* stone-ish */
-
-    /* Cards: slightly lighter neutral */
-    --panel: #e4e1de;
-
-    /* Secondary surface (left pane): slightly darker than cards */
-    --panel-2: #cfcac5;
+    /* Page + surfaces (no pure white) */
+    --bg: #f3f4f6;       /* page background */
+    --panel: #f8fafc;    /* cards */
+    --panel-2: #eef2f7;  /* left pane */
 
     /* Text */
-    --text: #111827;
-    --muted: #374151;
+    --text: #0f172a;
+    --muted: #475569;
 
-    /* Borders */
-    --border: #b8b2ab;
+    /* Lines + accent */
+    --border: #e2e8f0;
+    --accent: #2563eb;
 
-    /* Accent: keep blue for links/buttons, but not too neon */
-    --accent: #1d4ed8;
+    /* Pills */
+    --chip-bg: #f1f5f9;
+    --badge-bg: #f1f5f9;
+    --badge-border: #cbd5e1;
 
-    /* Chips/badges: subtle, not white */
-    --chip-bg: rgba(255, 255, 255, 0.22);
-    --badge-bg: rgba(255, 255, 255, 0.22);
-    --badge-border: #a39d96;
+    /* Shadows: subtle, “minimal app” */
+    --shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.06);
 
     --modal-backdrop: rgba(15, 23, 42, 0.22);
-
-    --shadow:
-        0 1px 0 rgba(17, 24, 39, 0.08),
-        0 10px 22px rgba(17, 24, 39, 0.14);
 }
 
-/* Inputs: match the neutral surface */
+/* Make inputs match surfaces (avoid bright white fields) */
 body.theme-light .header-right input[type="date"],
 body.theme-light .sensor-filter select {
-    background: rgba(255, 255, 255, 0.22);
+    background: var(--panel);
     border-color: var(--border);
 }
 
-/* Inner cards + code blocks: slightly inset */
+/* Slight inset for inner cards/code so everything isn’t the same “sheet” */
 body.theme-light .mitre-card,
 body.theme-light .sigma-card,
 body.theme-light pre {
-    background: rgba(255, 255, 255, 0.18);
+    background: #f1f5f9;
 }
+
 
 
 body {
