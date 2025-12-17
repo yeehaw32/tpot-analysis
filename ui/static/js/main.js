@@ -105,8 +105,8 @@ function renderKeyIndicators(key) {
     return `
         <div class="block">
             <div class="block-header">
-                <h3>Key indicators</h3>
-                <span class="chip">AI Layer 1 (deterministic)</span>
+                <h3>Session Observables</h3>    
+                <span class="chip">Extracted from events</span>
             </div>
 
             <dl class="kv">
@@ -141,7 +141,7 @@ function renderMitreCandidates(list) {
         <details class="block" open>
             <summary class="block-header">
                 <h3 style="margin:0;">MITRE candidates</h3>
-                <span class="chip">AI Layer 2 (RAG)</span>
+                <span class="chip">AI Layer 2 (RAG enrichment)</span>
             </summary>
 
             <p class="section-help">${distanceHelpText()}</p>
@@ -179,7 +179,7 @@ function renderSigmaCandidates(list) {
         <details class="block" open>
             <summary class="block-header">
                 <h3 style="margin:0;">Sigma candidates</h3>
-                <span class="chip">AI Layer 2 (RAG)</span>
+                <span class="chip">AI Layer 2 (RAG enrichment)</span>
             </summary>
 
             <p class="section-help">${distanceHelpText()}</p>

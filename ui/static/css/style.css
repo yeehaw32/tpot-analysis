@@ -20,24 +20,53 @@
     --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
 }
 
-/* Light theme (more depth, less "all white") */
+/* Light theme (readable, low-glare) */
 body.theme-light {
-    --bg: #f1f5f9;        /* page background (tinted) */
-    --panel: #ffffff;     /* cards */
-    --panel-2: #eaf1fb;   /* left pane background */
-    --text: #0f172a;
-    --muted: #475569;
-    --border: #dbe5f3;    /* softer borders */
-    --accent: #2563eb;
+    /* Page background: soft, slightly warm-gray (reduces "flashlight") */
+    --bg: #f3f4f6;
 
-    --chip-bg: #f1f5f9;
-    --badge-bg: #f1f5f9;
+    /* Card surfaces: not pure white, slightly off-white */
+    --panel: #fbfbfc;
+
+    /* Left pane / secondary surface: subtle tint */
+    --panel-2: #eef2f7;
+
+    /* Text: strong but not harsh black */
+    --text: #0b1220;
+
+    /* Muted text: readable on light backgrounds */
+    --muted: #4b5563;
+
+    /* Borders: visible but soft */
+    --border: #d6dee9;
+
+    /* Accent: slightly less intense than default blue */
+    --accent: #1d4ed8;
+
+    /* Pills / chips: distinct but calm */
+    --chip-bg: #eef2f7;
+    --badge-bg: #eef2f7;
     --badge-border: #cbd5e1;
 
-    --modal-backdrop: rgba(15, 23, 42, 0.25);
+    /* Modal backdrop */
+    --modal-backdrop: rgba(15, 23, 42, 0.22);
 
-    --shadow: 0 1px 0 rgba(15,23,42,0.04), 0 10px 22px rgba(15,23,42,0.08);
+    /* Shadow: stronger separation in light mode */
+    --shadow:
+        0 1px 0 rgba(15, 23, 42, 0.04),
+        0 10px 24px rgba(15, 23, 42, 0.10);
 }
+
+/* Optional: slightly reduce link glare in light mode */
+body.theme-light a {
+    color: var(--accent);
+}
+
+/* Optional: make code/pre backgrounds slightly darker in light mode (less glare) */
+body.theme-light pre {
+    background: #f1f5f9;
+}
+
 
 body {
     margin: 0;
