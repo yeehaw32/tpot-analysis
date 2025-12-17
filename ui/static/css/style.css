@@ -20,44 +20,53 @@
     --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
 }
 
-/* Light theme: clean + minimal (neutral, low glare) */
+/* Alternate theme: Graphite (clean, professional, minimal, NOT bright) */
 body.theme-light {
-    /* Page + surfaces (no pure white) */
-    --bg: #f3f4f6;       /* page background */
-    --panel: #f8fafc;    /* cards */
-    --panel-2: #eef2f7;  /* left pane */
+    /* Neutral charcoal background */
+    --bg: #1c1c1f;
+
+    /* Card surfaces slightly lighter than bg */
+    --panel: #25252a;
+
+    /* Left pane / secondary surface */
+    --panel-2: #212126;
 
     /* Text */
-    --text: #0f172a;
-    --muted: #475569;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
 
-    /* Lines + accent */
-    --border: #e2e8f0;
-    --accent: #2563eb;
+    /* Borders */
+    --border: #3f3f46;
 
-    /* Pills */
-    --chip-bg: #f1f5f9;
-    --badge-bg: #f1f5f9;
-    --badge-border: #cbd5e1;
+    /* Accent (kept minimal) */
+    --accent: #3b82f6;
 
-    /* Shadows: subtle, “minimal app” */
-    --shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.06);
+    /* Chips/badges */
+    --chip-bg: rgba(255, 255, 255, 0.06);
+    --badge-bg: rgba(255, 255, 255, 0.06);
+    --badge-border: #52525b;
 
-    --modal-backdrop: rgba(15, 23, 42, 0.22);
+    /* Modal backdrop */
+    --modal-backdrop: rgba(0, 0, 0, 0.55);
+
+    /* Shadow: subtle, modern */
+    --shadow:
+        0 1px 0 rgba(255, 255, 255, 0.03),
+        0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-/* Make inputs match surfaces (avoid bright white fields) */
-body.theme-light .header-right input[type="date"],
-body.theme-light .sensor-filter select {
-    background: var(--panel);
-    border-color: var(--border);
-}
-
-/* Slight inset for inner cards/code so everything isn’t the same “sheet” */
+/* Make inner cards/code slightly inset but still minimal */
 body.theme-light .mitre-card,
 body.theme-light .sigma-card,
 body.theme-light pre {
-    background: #f1f5f9;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Inputs should match the surface (no bright fields) */
+body.theme-light .header-right input[type="date"],
+body.theme-light .sensor-filter select {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border);
 }
 
 
