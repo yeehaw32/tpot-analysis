@@ -2,74 +2,28 @@
     box-sizing: border-box;
 }
 
+/* Permanent theme: Graphite (clean, professional, minimalist) */
 :root {
-    --bg: #0f172a;
-    --panel: #020617;
-    --panel-2: #0b1220;
-    --text: #e5e7eb;
-    --muted: #9ca3af;
-    --border: #1f2937;
-    --accent: #2563eb;
-
-    --chip-bg: transparent;
-    --badge-bg: #111827;
-    --badge-border: #4b5563;
-
-    --modal-backdrop: rgba(15, 23, 42, 0.7);
-
-    --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
-}
-
-/* Alternate theme: Graphite (clean, professional, minimal, NOT bright) */
-body.theme-light {
-    /* Neutral charcoal background */
     --bg: #1c1c1f;
-
-    /* Card surfaces slightly lighter than bg */
     --panel: #25252a;
-
-    /* Left pane / secondary surface */
     --panel-2: #212126;
 
-    /* Text */
     --text: #f4f4f5;
     --muted: #a1a1aa;
 
-    /* Borders */
     --border: #3f3f46;
-
-    /* Accent (kept minimal) */
     --accent: #3b82f6;
 
-    /* Chips/badges */
     --chip-bg: rgba(255, 255, 255, 0.06);
     --badge-bg: rgba(255, 255, 255, 0.06);
     --badge-border: #52525b;
 
-    /* Modal backdrop */
     --modal-backdrop: rgba(0, 0, 0, 0.55);
 
-    /* Shadow: subtle, modern */
     --shadow:
-        0 1px 0 rgba(255, 255, 255, 0.03),
-        0 12px 28px rgba(0, 0, 0, 0.35);
+        0 1px 0 rgba(255,255,255,0.03),
+        0 12px 28px rgba(0,0,0,0.35);
 }
-
-/* Make inner cards/code slightly inset but still minimal */
-body.theme-light .mitre-card,
-body.theme-light .sigma-card,
-body.theme-light pre {
-    background: rgba(255, 255, 255, 0.04);
-}
-
-/* Inputs should match the surface (no bright fields) */
-body.theme-light .header-right input[type="date"],
-body.theme-light .sensor-filter select {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--border);
-}
-
-
 
 body {
     margin: 0;
@@ -87,7 +41,7 @@ a:hover { text-decoration: underline; }
 .page {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* important: keeps scrolling inside panes */
+    height: 100vh;
 }
 
 /* HEADER */
@@ -123,7 +77,7 @@ a:hover { text-decoration: underline; }
 .header-right input[type="date"],
 .sensor-filter select {
     padding: 6px 8px;
-    background: var(--panel);
+    background: rgba(255,255,255,0.06);
     border: 1px solid var(--border);
     color: var(--text);
     border-radius: 8px;
@@ -148,10 +102,10 @@ a:hover { text-decoration: underline; }
 .main {
     display: flex;
     flex: 1;
-    min-height: 0; /* crucial for internal scroll containers */
+    min-height: 0;
 }
 
-/* LEFT PANEL (does NOT scroll as a page; list scrolls internally) */
+/* LEFT PANEL */
 
 .sessions-panel {
     flex: 0 0 clamp(260px, 22vw, 360px);
@@ -164,7 +118,7 @@ a:hover { text-decoration: underline; }
 
     position: sticky;
     top: 0;
-    height: calc(100vh - 58px); /* approx header height; keeps it pinned */
+    height: calc(100vh - 58px);
 }
 
 .sessions-panel-header {
@@ -190,7 +144,7 @@ a:hover { text-decoration: underline; }
 
 .sessions-list {
     flex: 1;
-    overflow-y: auto;    /* left list scrolls internally */
+    overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
@@ -198,7 +152,7 @@ a:hover { text-decoration: underline; }
     padding-right: 2px;
 }
 
-/* nicer scrollbar */
+/* scrollbars */
 .sessions-list::-webkit-scrollbar,
 .detail-scroll::-webkit-scrollbar {
     width: 10px;
@@ -301,7 +255,7 @@ a:hover { text-decoration: underline; }
     white-space: nowrap;
 }
 
-/* RIGHT PANEL (only this area scrolls) */
+/* RIGHT PANEL */
 
 .detail-panel {
     flex: 1;
@@ -309,7 +263,7 @@ a:hover { text-decoration: underline; }
     flex-direction: column;
     min-height: 0;
     padding: 12px 14px;
-    overflow: hidden; /* prevents page-like scrolling here */
+    overflow: hidden;
 }
 
 .detail-panel-header {
@@ -334,7 +288,7 @@ a:hover { text-decoration: underline; }
 
 .detail-scroll {
     flex: 1 1 auto;
-    overflow-y: auto;  /* right pane scrolls */
+    overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
     padding-right: 4px;
@@ -475,12 +429,10 @@ a:hover { text-decoration: underline; }
     padding: 10px 10px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--panel) 88%, var(--bg));
+    background: rgba(255,255,255,0.04);
 }
 
-.mitre-left {
-    min-width: 0;
-}
+.mitre-left { min-width: 0; }
 
 .mitre-title {
     display: flex;
@@ -515,7 +467,7 @@ a:hover { text-decoration: underline; }
     padding: 10px 10px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--panel) 88%, var(--bg));
+    background: rgba(255,255,255,0.04);
 }
 
 .sigma-title {
@@ -539,7 +491,7 @@ a:hover { text-decoration: underline; }
     font-size: 12px;
     border-radius: 10px;
     border: 1px solid var(--badge-border);
-    background: var(--panel);
+    background: rgba(255,255,255,0.06);
     color: var(--text);
     cursor: pointer;
 }
@@ -561,7 +513,7 @@ details.block > summary::-webkit-details-marker {
 /* pre/code */
 pre {
     font-size: 12px;
-    background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+    background: rgba(255,255,255,0.04);
     padding: 10px;
     border-radius: 12px;
     overflow-x: auto;
@@ -584,9 +536,7 @@ code {
     z-index: 40;
 }
 
-.modal.hidden {
-    display: none;
-}
+.modal.hidden { display: none; }
 
 .modal-backdrop {
     position: absolute;
@@ -623,9 +573,7 @@ code {
     cursor: pointer;
 }
 
-.modal-close:hover {
-    color: var(--text);
-}
+.modal-close:hover { color: var(--text); }
 
 .copy-btn {
     background: var(--accent);
@@ -637,13 +585,9 @@ code {
     margin-bottom: 10px;
 }
 
-.copy-btn:hover {
-    filter: brightness(0.94);
-}
+.copy-btn:hover { filter: brightness(0.94); }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
 #sigma-modal-body.hljs {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -652,16 +596,13 @@ code {
 
 /* RESPONSIVE */
 @media (max-width: 1100px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
+    .detail-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
     .page { height: auto; }
-    .main {
-        flex-direction: column;
-    }
+    .main { flex-direction: column; }
+
     .sessions-panel {
         position: relative;
         top: auto;
@@ -670,11 +611,7 @@ code {
         border-bottom: 1px solid var(--border);
         max-height: 38vh;
     }
-    .detail-panel {
-        overflow: visible;
-    }
-    .detail-scroll {
-        overflow: visible;
-        padding-right: 0;
-    }
+
+    .detail-panel { overflow: visible; }
+    .detail-scroll { overflow: visible; padding-right: 0; }
 }

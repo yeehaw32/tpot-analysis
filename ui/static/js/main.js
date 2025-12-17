@@ -25,7 +25,7 @@ function fmtTime(ts) {
 }
 
 function distanceHelpText() {
-    return `Distance is a similarity score from the RAG matching. Lower = closer match, higher = weaker match.`;
+    return `Distance is a similarity distance from retrieval. Lower = closer match; higher = weaker match.`;
 }
 
 function renderSessionsList(data) {
@@ -47,7 +47,6 @@ function renderSessionsList(data) {
         item.className = "session-item";
         item.dataset.sessionId = s.session_id;
 
-        // Summary moved to tooltip to keep list compact
         if (s.short_summary) item.title = s.short_summary;
 
         const srcIp = s.src_ip || "-";
@@ -84,7 +83,7 @@ function renderSessionsList(data) {
 }
 
 function renderKeyIndicators(key) {
-    if (!key) return "<div class='block'><p style='margin:0; color:var(--muted);'>No key indicators.</p></div>";
+    if (!key) return "<div class='block'><p style='margin:0; color:var(--muted);'>No observables.</p></div>";
 
     const srcPorts = asList(key.src_ports).join(", ");
     const destPorts = asList(key.dest_ports).join(", ");
@@ -105,7 +104,7 @@ function renderKeyIndicators(key) {
     return `
         <div class="block">
             <div class="block-header">
-                <h3>Session Observables</h3>    
+                <h3>Session observables</h3>
                 <span class="chip">Extracted from events</span>
             </div>
 
@@ -225,7 +224,7 @@ function renderSessionDetail(data) {
                 <div class="block">
                     <div class="block-header">
                         <h3>Overview</h3>
-                        <span class="chip">AI Layer 1</span>
+                        <span class="chip">AI Layer 1 (model output)</span>
                     </div>
 
                     <dl class="kv">
@@ -241,7 +240,7 @@ function renderSessionDetail(data) {
                 <div class="block">
                     <div class="block-header">
                         <h3>Summary</h3>
-                        <span class="chip">AI Layer 1</span>
+                        <span class="chip">AI Layer 1 (model output)</span>
                     </div>
                     <p style="margin:0; line-height:1.45;">${data.summary || "-"}</p>
                 </div>
@@ -387,21 +386,6 @@ async function openSigmaModal(sid, titleText) {
 
 document.addEventListener("DOMContentLoaded", () => {
     setupSigmaModal();
-
-    const themeBtn = document.getElementById("theme-toggle");
-    if (themeBtn) {
-        const saved = localStorage.getItem("ui_theme");
-        if (saved) {
-            document.body.classList.toggle("theme-light", saved === "light");
-            themeBtn.textContent = (saved === "light") ? "Dark mode" : "Light mode";
-        }
-
-        themeBtn.addEventListener("click", () => {
-            const isLight = document.body.classList.toggle("theme-light");
-            localStorage.setItem("ui_theme", isLight ? "light" : "dark");
-            themeBtn.textContent = isLight ? "Dark mode" : "Light mode";
-        });
-    }
 
     document.getElementById("reload-btn").addEventListener("click", () => {
         loadSessions(getSelectedDate());
