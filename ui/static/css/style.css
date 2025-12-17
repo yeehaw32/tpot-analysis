@@ -20,52 +20,53 @@
     --shadow: 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25);
 }
 
-/* Light theme (readable, low-glare) */
+/* Light-ish theme (dim light / low-glare) */
 body.theme-light {
-    /* Page background: soft, slightly warm-gray (reduces "flashlight") */
-    --bg: #f3f4f6;
+    /* Page background: mid-light slate (NOT white) */
+    --bg: #cfd8e3;
 
-    /* Card surfaces: not pure white, slightly off-white */
-    --panel: #fbfbfc;
+    /* Surfaces/cards: light slate, still clearly lighter than dark mode */
+    --panel: #dde6f1;
 
-    /* Left pane / secondary surface: subtle tint */
-    --panel-2: #eef2f7;
+    /* Secondary surface (left pane background) */
+    --panel-2: #c5d0dd;
 
-    /* Text: strong but not harsh black */
+    /* Text colors */
     --text: #0b1220;
+    --muted: #334155;
 
-    /* Muted text: readable on light backgrounds */
-    --muted: #4b5563;
-
-    /* Borders: visible but soft */
-    --border: #d6dee9;
-
-    /* Accent: slightly less intense than default blue */
+    /* Borders + accent */
+    --border: #aebac8;
     --accent: #1d4ed8;
 
-    /* Pills / chips: distinct but calm */
-    --chip-bg: #eef2f7;
-    --badge-bg: #eef2f7;
-    --badge-border: #cbd5e1;
+    /* Chips/badges */
+    --chip-bg: rgba(255, 255, 255, 0.35);
+    --badge-bg: rgba(255, 255, 255, 0.35);
+    --badge-border: #9aa7b7;
 
     /* Modal backdrop */
     --modal-backdrop: rgba(15, 23, 42, 0.22);
 
-    /* Shadow: stronger separation in light mode */
+    /* Shadow: enough separation without looking “glowy” */
     --shadow:
-        0 1px 0 rgba(15, 23, 42, 0.04),
-        0 10px 24px rgba(15, 23, 42, 0.10);
+        0 1px 0 rgba(15, 23, 42, 0.08),
+        0 10px 22px rgba(15, 23, 42, 0.12);
 }
 
-/* Optional: slightly reduce link glare in light mode */
-body.theme-light a {
-    color: var(--accent);
+/* Make inputs look like part of the surface (not bright white) */
+body.theme-light .header-right input[type="date"],
+body.theme-light .sensor-filter select {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: var(--border);
 }
 
-/* Optional: make code/pre backgrounds slightly darker in light mode (less glare) */
+/* Reduce “flashlight” effect inside inner cards in light mode */
+body.theme-light .mitre-card,
+body.theme-light .sigma-card,
 body.theme-light pre {
-    background: #f1f5f9;
+    background: rgba(255, 255, 255, 0.28);
 }
+
 
 
 body {
