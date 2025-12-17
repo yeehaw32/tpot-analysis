@@ -543,6 +543,21 @@ code {
     inset: 0;
     background: var(--modal-backdrop);
 }
+.cmd-line {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.cmd-prompt {
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    user-select: none;
+    width: 14px;          /* lines align nicely */
+    text-align: right;
+    opacity: 0.85;
+}
+
 
 .modal-content {
     position: relative;

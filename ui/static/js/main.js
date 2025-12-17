@@ -90,7 +90,9 @@ function renderKeyIndicators(key) {
     const protocols = asList(key.protocols).join(", ");
 
     const commands = asList(key.commands)
-        .map(c => `<li><code>${c}</code></li>`).join("");
+    .map(c => `<li class="cmd-line"><span class="cmd-prompt">$</span><code>${c}</code></li>`)
+    .join("");
+
 
     const urls = asList(key.urls)
         .map(u => `<li><a href="${u}" target="_blank" rel="noreferrer">${u}</a></li>`).join("");
