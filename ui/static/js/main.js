@@ -127,8 +127,8 @@ function renderKeyIndicators(key) {
             <h4>Files</h4>
             <ul class="list" style="gap:4px;">${files || "<li style='color:var(--muted);'>None</li>"}</ul>
 
-            <h4>Signatures</h4>
-            <ul class="list" style="gap:4px;">${sigs || "<li style='color:var(--muted);'>None</li>"}</ul>
+            // <h4>Signatures</h4>
+            // <ul class="list" style="gap:4px;">${sigs || "<li style='color:var(--muted);'>None</li>"}</ul>
         </div>
     `;
 }
