@@ -1,5 +1,0 @@
-Metadata-Version: 2.4
-Name: tpot_analysis
-Version: 0.1.0
-Summary: RAG-enriched honeypot analysis pipeline
-Requires-Python: >=3.10

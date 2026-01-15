@@ -55,7 +55,6 @@ Produces:
 
 ```
 /data/tpot_sessions/raw/tpot_raw_honeypots_2025-11-11.json
-/data/tpot_sessions/raw/tpot_raw_suricata_2025-11-11.json
 ```
 
 ---
@@ -72,7 +71,6 @@ Output:
 /data/tpot_sessions/normalized/<date>/cowrie.json
 /data/tpot_sessions/normalized/<date>/wordpot.json
 /data/tpot_sessions/normalized/<date>/dionaea.json
-/data/tpot_sessions/normalized/<date>/suricata.json
 ```
 
 ---
@@ -89,7 +87,6 @@ Creates:
 /data/tpot_sessions/sessionized/2025-11-11/cowrie_sessions.json
 /data/tpot_sessions/sessionized/2025-11-11/dionaea_sessions.json
 /data/tpot_sessions/sessionized/2025-11-11/wordpot_sessions.json
-/data/tpot_sessions/sessionized/2025-11-11/suricata_sessions.json
 ```
 
 ---

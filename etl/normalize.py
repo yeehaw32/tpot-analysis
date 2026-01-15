@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use the names from .env (with safe defaults)
 ETL_DATA_DIR = os.getenv("TPOT_RAW_DIR", "/data/tpot_sessions/raw")
 NORMALIZED_BASE = os.getenv("TPOT_NORMALIZED_DIR", "/data/tpot_sessions/normalized")
 
@@ -95,45 +94,6 @@ def normalize_dionaea(src):
     return event
 
 
-def normalize_suricata(src):
-    timestamp = src.get("@timestamp") or src.get("timestamp")
-
-    alert = src.get("alert", {}) or {}
-
-    signature = alert.get("signature")
-    signature_id = alert.get("signature_id")
-    category = alert.get("category")
-    severity = alert.get("severity")
-
-    event = {
-        "timestamp": timestamp,
-        "sensor": "Suricata",
-        "session_id": None,  # Suricata sessionized by time windows
-
-        "src_ip": src.get("src_ip"),
-        "src_port": src.get("src_port"),
-        "dest_ip": src.get("dest_ip") or src.get("t-pot_ip_int"),
-        "dest_port": src.get("dest_port"),
-
-        "protocol": src.get("proto"),
-        "event_type": src.get("event_type"),
-
-        # NEW FIELDS (critical fix)
-        "signatures": [signature] if signature else [],
-        "signature_ids": [signature_id] if signature_id else [],
-        "categories": [category] if category else [],
-        "severities": [severity] if severity else [],
-
-        # placeholders for consistency
-        "eventid": None,
-        "message": None,
-        "url": None,
-        "connection": None,
-
-        "raw": src,
-    }
-
-    return event
 
 
 
@@ -167,9 +127,7 @@ def process_hits(hits, out_dict):
         elif sensor_type == "Dionaea":
             norm = normalize_dionaea(src)
             key = "dionaea"
-        elif sensor_type == "Suricata":
-            norm = normalize_suricata(src)
-            key = "suricata"
+        
         else:
             # Unknown / unhandled type, skip for now
             continue
@@ -203,13 +161,8 @@ def main():
     print("Using RAW_DIR:", ETL_DATA_DIR)
     print("Using NORMALIZED_BASE:", NORMALIZED_BASE)
 
-    # find latest raw honeypots and suricata files
+    # find latest raw honeypots files
     honeypots_path = find_latest_file("tpot_raw_honeypots_")
-    suricata_path = find_latest_file("tpot_raw_suricata_")
-
-    if not honeypots_path and not suricata_path:
-        print("No raw files found in", ETL_DATA_DIR)
-        return
 
     out_dict = {}
 
@@ -220,14 +173,7 @@ def main():
         process_hits(hits, out_dict)
     else:
         print("No honeypots raw file found.")
-
-    # process suricata file
-    if suricata_path:
-        print("Loading suricata from:", suricata_path)
-        hits = load_json_file(suricata_path)
-        process_hits(hits, out_dict)
-    else:
-        print("No suricata raw file found.")
+    
 
     # save per-day, per-sensor files
     if out_dict:

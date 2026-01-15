@@ -65,7 +65,7 @@ def build_layer1_system_prompt() -> str:
         Rules:
         - Only use the information present in the provided session.
         - Do NOT use external knowledge, databases, or documentation.
-        - Do NOT claim to know exact MITRE techniques, Sigma rules, or Suricata rules.
+        - Do NOT claim to know exact MITRE techniques, Sigma rules.
         - Do NOT extract or infer observables into key_indicators. Leave key_indicators empty (the pipeline fills it deterministically).
         - Stay strictly within the evidence you see.
         - If something is unclear, mark it as "unknown" rather than guessing wildly.

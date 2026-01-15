@@ -92,25 +92,6 @@ def sessionize_dionaea(events):
     return sessions
 
 
-def sessionize_suricata(events):
-    """Suricata grouped into 30-second network bursts."""
-    if not events:
-        return []
-
-    events.sort(key=lambda x: x["timestamp"])
-    sessions = []
-    current = [events[0]]
-    window = timedelta(seconds=30)
-
-    for e in events[1:]:
-        if parse_time(e["timestamp"]) - parse_time(current[-1]["timestamp"]) <= window:
-            current.append(e)
-        else:
-            sessions.append(current)
-            current = [e]
-
-    sessions.append(current)
-    return sessions
 
 
 # ---------------------------------------------------------------------------
@@ -126,7 +107,6 @@ def wrap_session(sensor, events_list):
         co_1f9a72c9ab3d
         wo_7a3fc915b23e
         di_4e87af98c012
-        su_61b2c56b9e44
     """
 
     if not events_list:
@@ -196,7 +176,6 @@ def process_day(date_str):
         "wordpot": sessionize_wordpot,
         "cowrie": sessionize_cowrie,
         "dionaea": sessionize_dionaea,
-        "suricata": sessionize_suricata,
     }
 
     for sensor, handler in sensors.items():

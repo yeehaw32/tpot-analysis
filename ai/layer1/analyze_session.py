@@ -62,7 +62,7 @@ def load_sessions_for_day(base_dir: Path, date_str: str) -> List[Dict[str, Any]]
 def make_model() -> ChatOpenAI:
     """
     Create the LangChain ChatOpenAI model for AI Layer 1.
-    We use gpt-4o-mini for cost efficiency.
+    gpt-4o-mini for cost efficiency.
     """
     model = ChatOpenAI(
         model="gpt-4o-mini",
@@ -136,14 +136,6 @@ def extract_key_indicators_from_session(session: Dict[str, Any]) -> Dict[str, An
                     if file_path not in files:
                         files.append(file_path)
 
-        # ------------------------------------------------------------------
-        # SURICATA SIGNATURES
-        # ------------------------------------------------------------------
-        if sensor == "Suricata":
-            sig_list = event.get("signatures", [])
-            for s in sig_list:
-                if s and s not in signatures:
-                    signatures.append(s)
 
     return {
         "src_ip": src_ip,

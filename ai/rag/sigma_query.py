@@ -88,10 +88,7 @@ def build_sigma_query_text(session_summary: dict) -> str:
     for u in urls[:MAX_URLS]:
         parts.append("URL: " + u)
 
-    # Suricata signatures (truncate)
-    sigs = indicators.get("signatures", [])
-    for s in sigs[:MAX_SIGNATURES]:
-        parts.append("Signature: " + str(s))
+    
 
     # Files (truncate)
     files = indicators.get("files", [])

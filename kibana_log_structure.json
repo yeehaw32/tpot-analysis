@@ -650,7 +650,7 @@
 ## Working fetch command ## 
 
 bertil@analysis:~$ curl -k -u admin:Nzs29zsa -H 'kbn-xsrf: true' -H 'Content-Type: application/json' "https://10.20.20.10:64297/kibana/api/console/proxy?path=logstash-2025.11.11/_search&method=POST" -d '{"size":10000,"sort":[{"@timestamp":"desc"}],
-     "query":{"terms":{"type.keyword":["Cowrie","Dionaea","Wordpot","Suricata"]}}}' >> 1.txt
+     "query":{"terms":{"type.keyword":["Cowrie","Dionaea","Wordpot"]}}}' >> 1.txt
 
 
      ssh -J root@79.171.148.157,bertil@10.10.10.50     bertil@10.30.30.10     -L 5000:127.0.0.1:5000

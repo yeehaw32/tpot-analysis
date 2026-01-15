@@ -60,7 +60,6 @@ def fetch(label, type_list):
 
 def main():
     fetch("honeypots", ["Cowrie", "Dionaea", "Wordpot"])
-    fetch("suricata", ["Suricata"])
 
 
 if __name__ == "__main__":

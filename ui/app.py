@@ -18,11 +18,6 @@ app = Flask(
     template_folder="templates"
 )
 
-# # Embedded ChromaDB client on Analysis VM
-# chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
-# sigma_collection = chroma_client.get_or_create_collection("sigma")
-# mitre_collection = chroma_client.get_or_create_collection("mitre")
-
 
 def today_str():
     return datetime.date.today().strftime("%Y-%m-%d")
@@ -113,7 +108,6 @@ def api_sessions():
         "sessions": sessions
     })
 
-
 @app.route("/api/session/<session_id>")
 def api_session_detail(session_id):
     date_str = request.args.get("date") or today_str()
@@ -121,7 +115,6 @@ def api_session_detail(session_id):
     if data is None:
         abort(404, description="Session not found")
     return jsonify(data)
-
 
 @app.route("/api/sigma/<sid>")
 def api_sigma_detail(sid):
