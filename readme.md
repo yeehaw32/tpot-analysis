@@ -113,15 +113,11 @@ python ai/rag/mitre_ingest.py /path/to/cti/enterprise-attack/attack-pattern
 
 ---
 
-## 7. Ingest Sigma Rules
 
-```bash
-python ai/rag/sigma_ingest.py /path/to/sigma/rules
-```
 
 ---
 
-## 8. RAG Enrichment
+## 7. RAG Enrichment
 
 ```python
 from ai.rag.enrich import enrich_session_full
@@ -130,11 +126,3 @@ res = enrich_session_full(summary, top_k=5)
 ```
 
 ---
-
-## 9. Run Tests
-
-```bash
-python tests/rag_mitre_test.py
-python tests/rag_sigma_test.py
-python tests/test_rag_crosslink.py
-```
